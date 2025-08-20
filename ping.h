@@ -30,8 +30,9 @@ typedef struct h_icmp{
 
 icmp *create_icmp_packet(uint8 type,uint8 code,uint8 *data,uint16 size);
 void error(const int8* msg);
-uint16 checksum(icmp *);
+uint16 checksum(icmp *,uint16 size);
 uint16 _checksum(uint16 *data,size_t n);
+void print_icmp_packet(icmp *packet,uint16);
 
 #endif
 
