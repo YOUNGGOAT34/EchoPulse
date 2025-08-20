@@ -1,7 +1,5 @@
 #include "hexadump.h"
 
-
-
 void hexadump(void *buff,uint16 size){
      const int8 *p=(const int8 *)buff;
 
@@ -18,7 +16,7 @@ void hexadump(void *buff,uint16 size){
       }
  
       printf("%02x",p[i]);
-      
+
 
          if((i%16)==15 || i==(size_t)size-1){
             for(j=0;j<15-(i%16);j++){
