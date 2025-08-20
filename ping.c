@@ -17,3 +17,18 @@ icmp *create_icmp_packet(uint8 type,uint8 code,uint8 *data,uint16 size){
      
      return packet;
 }
+
+uint16 _checksum(uint16 *data,size_t n){
+      uint32 sum=0;
+   
+      for(size_t i=0;i<n;i++){
+            sum+=data[i];
+      }
+
+      while(sum>>16){
+              sum=(sum>>16)+(sum & 0xFFFF);
+      }
+
+     
+      return (uint16)~sum;
+}
