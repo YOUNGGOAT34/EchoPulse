@@ -19,34 +19,37 @@ icmp *create_icmp_packet(uint8 type,uint8 code,uint8 *data,uint16 size){
      if(!packet){
          error("Failed to allocate memory for the ICMP");  
      }
+     memset(packet,0,sizeof(icmp));
      packet->code=code;
      packet->type=type;
      if(data && size>0) memcpy(packet->data,data,size);
-     packet->checksum=checksum(packet,size);
-     
+     packet->checksum=0;
+     packet->checksum=checksum(packet,size+sizeof(icmp));
      return packet;
 }
 
-
-uint16 _checksum(uint16 *data,size_t n){
+ 
+uint16 _checksum(uint8 *data,size_t n){
+      
       uint32 sum=0;
-   
-      for(size_t i=0;i<n;i++){
-            sum+=data[i];
+      for(size_t i=0;i<n;i+=2){
+          uint16 word=data[i]<<8;
+          if(i+1<n) word |=data[i+1];
+          sum+=word;
+          printf("sum+%x=%x\n",word,sum);
       }
-
+      
       while(sum>>16){
               sum=(sum>>16)+(sum & 0xFFFF);
       }
-
-     
+       printf("%04x\n",sum);
       return (uint16)~sum;
 }
 
 
 uint16 checksum(icmp *packet,uint16 size){
     uint8 *buff=(uint8 *)packet;
-
+    
     if(size % 2 !=0){
         //padding
         uint8 *padded_packet=malloc(size+1);
@@ -55,12 +58,12 @@ uint16 checksum(icmp *packet,uint16 size){
         }
         memcpy(padded_packet,buff,size);
         padded_packet[size]=0;
+
         
-        uint16 res=_checksum((uint16 *)padded_packet,(((size_t)size+1)/2));
+        uint16 res=_checksum(padded_packet,((sizeof(icmp)+size)));
         free(padded_packet);
         return res;
     }
-
-    return _checksum((uint16 *)packet,((size_t)size/2));
-    
+     
+    return _checksum(buff,sizeof(icmp)+size);    
 }
