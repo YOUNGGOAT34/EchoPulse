@@ -1,7 +1,7 @@
 #include "hexadump.h"
 
-void hexadump(void *buff,uint16 size){
-     const int8 *p=(const int8 *)buff;
+void hexadump(void *buff,u16 size){
+     const i8 *p=(const i8 *)buff;
 
      size_t i,j;
 

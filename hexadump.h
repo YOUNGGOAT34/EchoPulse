@@ -5,5 +5,5 @@
 
 #define IS_PRINTABLE_ASCII(c) (((c)>31) && ((c)<127))
 
-void hexadump(void *buff,uint16 size);
+void hexadump(void *buff,u16 size);
 #endif
