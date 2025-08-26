@@ -1,5 +1,5 @@
-#ifndef PING_H
-#define PING_H
+#ifndef ICMP_H
+#define ICMP_H
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -22,15 +22,28 @@ typedef unsigned short int u16;
 typedef unsigned char u8;
 typedef char i8;
 
+typedef enum{
+    echo,
+    reply,
+}TYPE;
+
+
 typedef struct h_icmp{
+     TYPE type;
+     u8 *data;
+     u16 size;
+
+}__attribute__((packed)) icmp;
+
+
+typedef struct raw_icmp{
      u8 type;
      u8 code;
      u16 checksum;
      u8 data[];
+}__attribute__((packed)) raw_icmp;
 
-}__attribute__((packed)) icmp;
-
-icmp *create_icmp_packet(u8 type,u8 code,u8 *data,u16 size);
+icmp *create_icmp_packet(TYPE type,u8 *data,u16 size);
 void error(const i8* msg);
 u16 checksum(icmp *,u16 size);
 u16 _checksum(u8 *data,size_t n);

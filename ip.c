@@ -72,3 +72,28 @@ IP *create_ip(const u8 type,u16 id,const i8 *dst){
 
   
 }
+
+
+void print_ip(u32 ip){
+    printf("%u.%u.%u.%u\n",
+      (ip>>24) & 0xFF,
+      (ip>>16) & 0xFF,
+      (ip>>8) & 0xFF,
+       ip & 0xFF
+    );
+}
+
+
+void print_ip_packet(IP *packet){
+     if(!packet){
+         error("Null IP packet\n");
+     }
+
+     printf("Type: %02hhx\n",packet->type);
+     printf("Type: %02hx\n",packet->id);
+     printf("src: ");
+     print_ip(packet->src);
+     printf("dst: ");
+     print_ip(packet->dst);
+
+}
