@@ -9,8 +9,9 @@ u32 get_local_ip(void){
     memset(&server,0,sizeof(server));
     server.sin_family=AF_INET;
     server.sin_addr.s_addr=inet_addr("8.8.8.8");
-    server.sin_port=htons(80);
+    server.sin_port=htons(53);
 
+  
     if(connect(sockfd,(struct sockaddr *)&server,sizeof(server))<0){
         error("Failed to connect to the google dns server\n");
     }
@@ -44,17 +45,18 @@ u32 get_local_ip(void){
   
 }
 
-IP *create_ip(const u8 type,u16 id,const i8 *dst){
+IP *create_ip_packet(const u8 type,u16 id,const i8 *dst){
       if(!dst){
           return NULL;
       }
 
       IP *packet=(IP *)malloc(sizeof(IP));
       if(!packet){
-         error("Failed to allocate memory for IP packet\n");
-      }
-
-      u32 src=get_local_ip();
+          error("Failed to allocate memory for IP packet\n");
+        }
+        
+        u32 src=get_local_ip();
+       
       u32 dst_ip=inet_addr(dst);
       
       if(dst_ip==INADDR_NONE){
@@ -62,9 +64,9 @@ IP *create_ip(const u8 type,u16 id,const i8 *dst){
       }
       memset(packet,0,sizeof(IP));
        
-      packet->dst=dst_ip;
+      packet->dst=htonl(dst_ip);
       packet->id=id;
-      packet->src=src;
+      packet->src=htonl(src);
       packet->type=type;
       packet->payload=NULL;
 
@@ -75,10 +77,10 @@ IP *create_ip(const u8 type,u16 id,const i8 *dst){
 
 u8 *create_raw_ip(IP *packet){
       if(!packet) return NULL;
-      u8 protocal=0;
+      u8 protocol=0;
       switch(packet->type){
          case ICMP:
-            protocal=1;
+            protocol=1;
             break;
 
         default:
@@ -98,7 +100,7 @@ u8 *create_raw_ip(IP *packet){
       rawpkt.ecn=0;
       rawpkt.flags=0;
       rawpkt.fragmet_offset=0;
-      rawpkt.protocal=protocal;
+      rawpkt.protocol=protocol;
       rawpkt.length=htons(ttlength);
       rawpkt.src=packet->src;
       rawpkt.dst=packet->dst;
@@ -155,7 +157,7 @@ void print_ip_packet(IP *packet){
      }
 
      printf("Type: %02hhx\n",packet->type);
-     printf("Type: %02hx\n",packet->id);
+     printf("id: %02hx\n",packet->id);
      printf("src: ");
      print_ip(packet->src);
      printf("dst: ");

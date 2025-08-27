@@ -1,4 +1,5 @@
 #include "hexadump.h"
+#include "ip.h"
 
 
 int main(){
@@ -14,6 +15,18 @@ int main(){
           printf("Empty\n");
      }
      hexadump((void *)raw,size);
+
+    
+     IP *pkt=create_ip_packet(ICMP,3000,"192.3.4.0");
+     pkt->payload=packet;
+
+     u8 *raw_bytes=create_raw_ip(pkt);
+     u16 _size=sizeof(RAWIP)+sizeof(raw_icmp)+pkt->payload->size;
+     print_ip_packet(pkt);
+
+     hexadump(raw_bytes,_size);
+
+     
      
 
 
