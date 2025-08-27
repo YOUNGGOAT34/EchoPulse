@@ -66,11 +66,48 @@ IP *create_ip(const u8 type,u16 id,const i8 *dst){
       packet->id=id;
       packet->src=src;
       packet->type=type;
-     
+      packet->payload=NULL;
 
       return packet;
 
   
+}
+
+u8 *create_raw_ip(IP *packet){
+      if(!packet) return NULL;
+      u8 protocal=0;
+      switch(packet->type){
+         case ICMP:
+            protocal=1;
+            break;
+
+        default:
+            return NULL;
+      }
+
+      u16 ttlength=sizeof(raw_icmp)+sizeof(RAWIP);
+      if(packet->payload){
+        ttlength+=packet->payload->size;
+      }
+      
+      RAWIP rawpkt;
+      rawpkt.ihl=sizeof(RAWIP)/4;
+      rawpkt.checksum=0;
+      rawpkt.id=htons(packet->id);
+      rawpkt.dscp=0;
+      rawpkt.ecn=0;
+      rawpkt.flags=0;
+      rawpkt.fragmet_offset=0;
+      rawpkt.protocal=protocal;
+      rawpkt.length=htons(ttlength);
+      rawpkt.src=packet->src;
+      rawpkt.dst=packet->dst;
+      rawpkt.TTL=250;
+      rawpkt.version=4;
+
+
+
+
 }
 
 
@@ -95,5 +132,9 @@ void print_ip_packet(IP *packet){
      print_ip(packet->src);
      printf("dst: ");
      print_ip(packet->dst);
+
+     if(packet->payload){
+        print_icmp_packet(packet->payload,packet->payload->size);
+     }
 
 }

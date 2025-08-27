@@ -25,6 +25,7 @@ typedef char i8;
 typedef enum{
     echo,
     reply,
+    ICMP
 }TYPE;
 
 
