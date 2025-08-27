@@ -105,8 +105,36 @@ u8 *create_raw_ip(IP *packet){
       rawpkt.TTL=250;
       rawpkt.version=4;
 
+      rawpkt.checksum=0;
+      rawpkt.checksum=checksum((u8 *)&rawpkt,rawpkt.ihl*4);
 
+      u16 total_length=ntohs(rawpkt.length);
 
+      u8 *p=(u8 *)malloc((u32)total_length);
+      if(!p){
+          error("Failed to allocate memory for raw ip pointer\n");
+        }
+        u8 *ptr=p;
+
+      if(!ptr){
+             error("Failed to allocate memory for pointer to raw bytes\n");
+         
+      }
+      memset(p,0,total_length);
+
+     memcpy(p,(u8 *)&rawpkt,sizeof(RAWIP));
+     
+     p+=sizeof(RAWIP);
+     if(packet->payload){
+         u8 *rawbytes=create_raw_icmp(packet->payload);
+         if(!rawbytes){
+             error("raw icmp bytes returned null\n");
+         }
+         memcpy(p,rawbytes,sizeof(raw_icmp)+packet->payload->size);
+         free(rawbytes);
+     }
+
+     return ptr;
 
 }
 

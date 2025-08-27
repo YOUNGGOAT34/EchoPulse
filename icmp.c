@@ -74,13 +74,20 @@ icmp *create_icmp_packet(TYPE type,u8 *data,u16 size){
 
  
 u16 checksum(u8 *data,size_t n){
-      
+ 
+      size_t i;
       u32 sum=0;
-      for(size_t i=0;i<n;i+=2){
+      for(i=0;i<n;i+=2){
           u16 word=data[i]<<8;
           if(i+1<n) word |=data[i+1];
           sum+=word;
         
+      }
+
+      if(n&1){
+        u16 word=data[i]<<8;
+        sum+=word;
+
       }
       
       while(sum>>16){

@@ -27,7 +27,7 @@ typedef struct raw_IP{
      u16 checksum;
      u32 src;
      u32 dst;
-     u8 options[]
+     u8 options[];
 
 }__attribute__((packed)) RAWIP;
 
