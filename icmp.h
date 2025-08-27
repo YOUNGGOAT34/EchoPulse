@@ -44,9 +44,9 @@ typedef struct raw_icmp{
 }__attribute__((packed)) raw_icmp;
 
 icmp *create_icmp_packet(TYPE type,u8 *data,u16 size);
+u8 *create_raw_icmp(icmp *packet);
 void error(const i8* msg);
-u16 checksum(icmp *,u16 size);
-u16 _checksum(u8 *data,size_t n);
+u16 checksum(u8 *data,size_t n);
 void print_icmp_packet(icmp *packet,u16);
 
 #endif
