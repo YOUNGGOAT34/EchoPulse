@@ -14,8 +14,8 @@ typedef struct IP{
 } __attribute__((packed)) IP;
 
 typedef struct raw_IP{
-     u8 version:4;
      u8 ihl:4;
+     u8 version:4;
      u8 dscp:6;
      u8 ecn:2;
      u16 length;

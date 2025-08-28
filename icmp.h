@@ -8,6 +8,7 @@
 #include "string.h"
 #include "errno.h"
 #include <unistd.h>
+#include <stdbool.h>
 #include <netinet/in.h>
 
 
@@ -16,11 +17,17 @@
 #define GREEN   "\033[1;32m"
 #define RESET "\033[0m"
 
+
 typedef unsigned long long int u64;
 typedef unsigned int u32;
 typedef unsigned short int u16;
 typedef unsigned char u8;
+
 typedef char i8;
+typedef signed long long int i64;
+typedef signed int i32;
+typedef signed short int i16;
+
 
 typedef enum{
     echo,
