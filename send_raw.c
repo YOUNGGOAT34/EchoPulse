@@ -1,6 +1,6 @@
 #include "send_raw.h"
 
-bool send_raw_ip(IP *packet){
+void send_raw_ip(IP *packet){
      if(!packet){
        error("Cannot send a null packet\n");
      }
@@ -27,11 +27,13 @@ bool send_raw_ip(IP *packet){
      if(packet->payload){
          size+=packet->payload->size;
      }
-     if(sendto(sockfd,raw_ip,size,0,(const struct sockaddr *)&dst,sizeof(dst))<0){
+
+     ssize_t bytes_sent=sendto(sockfd,raw_ip,size,0,(const struct sockaddr *)&dst,sizeof(dst));
+     if(bytes_sent<0){
          error("sending raw ip packet\n");
      }
 
+     printf("%ld byetes sent\n",bytes_sent);
+
      
-     
-     return true;
 }

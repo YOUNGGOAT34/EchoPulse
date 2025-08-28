@@ -2,7 +2,7 @@
 #include "hexadump.h"
 
 void error(const i8* msg){
-   fprintf(stderr,RED"Error:%s\n",msg);
+   fprintf(stderr,RED"Error:%s (%s)\n",msg,strerror(errno));
    exit(EXIT_FAILURE);
 }
 

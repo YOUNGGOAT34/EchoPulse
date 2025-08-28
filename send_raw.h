@@ -3,6 +3,6 @@
 
 #include "ip.h"
 
-bool send_raw_ip(IP *);
+void send_raw_ip(IP *);
 
 #endif
