@@ -9,7 +9,6 @@ int main(){
      
      icmp *packet = create_icmp_packet(echo,data, data_size);
      // print_icmp_packet(packet, sizeof(icmp) + data_size);
-
      u8 *raw=create_raw_icmp(packet);
      u16 size=sizeof(raw_icmp)+data_size;
      if(!raw){
@@ -28,9 +27,14 @@ int main(){
 
      send_raw_ip(pkt);
 
-     
-     
+     free(packet);
+     free(pkt);
+     free(raw);
+     free(raw_bytes);
 
+     
+     
+    
 
      return 0;
 }

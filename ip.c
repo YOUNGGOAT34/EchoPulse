@@ -133,7 +133,7 @@ u8 *create_raw_ip(IP *packet){
              error("raw icmp bytes returned null\n");
          }
          memcpy(p,rawbytes,sizeof(raw_icmp)+packet->payload->size);
-         free(rawbytes);
+        //  free(rawbytes);
      }
 
      return ptr;
