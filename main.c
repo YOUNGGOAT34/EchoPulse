@@ -16,7 +16,7 @@ int main(){
      }
      hexadump((void *)raw,size);
 
-     IP *pkt=create_ip_packet(ICMP,3000,"192.3.4.2");
+     IP *pkt=create_ip_packet(ICMP,3000,"8.8.8.8");
      pkt->payload=packet;
 
      u8 *raw_bytes=create_raw_ip(pkt);

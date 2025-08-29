@@ -64,9 +64,9 @@ IP *create_ip_packet(const u8 type,u16 id,const i8 *dst){
       }
       memset(packet,0,sizeof(IP));
        
-      packet->dst=htonl(dst_ip);
+      packet->dst=dst_ip;
       packet->id=id;
-      packet->src=htonl(src);
+      packet->src=src;
       packet->type=type;
       packet->payload=NULL;
 
