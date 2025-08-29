@@ -38,8 +38,9 @@ void send_raw_ip(IP *packet){
          error("sending raw ip packet\n");
      }
 
-     printf("%ld byetes sent\n",bytes_sent);
-    
+  
+
+     
      recv_ip_packet(sockfd);
 
      close(sockfd);
@@ -76,6 +77,9 @@ void recv_ip_packet(i32 sockfd){
       printf(RED "Destination Unreachable (code %d)\n" RESET, ricmp->code);
    }
 
-   printf("%ld byetes received\n",bytes_received);
+   printf("%ld bytes ",bytes_received);
+   printf("from ");
+   // print_ip(packet->dst);
+   
 
 }

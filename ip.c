@@ -124,7 +124,7 @@ u8 *create_raw_ip(IP *packet){
       }
       memset(p,0,total_length);
 
-     memcpy(p,(u8 *)&rawpkt,sizeof(RAWIP));
+      memcpy(p,(u8 *)&rawpkt,sizeof(RAWIP));
      
      p+=sizeof(RAWIP);
      if(packet->payload){
@@ -141,13 +141,19 @@ u8 *create_raw_ip(IP *packet){
 }
 
 
-void print_ip(u32 ip){
-    printf("%u.%u.%u.%u\n",
+i8 *print_ip(u32 ip){
+    i8 *str=malloc(16);
+    if(!str){
+         error("Failed to allocate memory for the IP return string\n");
+    }
+    snprintf(str,16,"%u.%u.%u.%u",
       (ip>>24) & 0xFF,
       (ip>>16) & 0xFF,
       (ip>>8) & 0xFF,
        ip & 0xFF
     );
+
+    return str;
 }
 
 
