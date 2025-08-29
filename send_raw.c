@@ -88,7 +88,7 @@ void recv_ip_packet(i32 sockfd){
       printf(RED "Destination Unreachable (code %d)\n" RESET, ricmp->code);
    }
 
-   printf("%ld bytes ",bytes_received);
+   printf("%ld bytes ",bytes_received-(res->ihl*4));
    printf("from %s: ",print_ip(src_addr.sin_addr.s_addr));
    printf("icmp_seq=%hd ",ntohs(ricmp->sequence));
   
