@@ -7,6 +7,7 @@ void error(const i8* msg){
 }
 
 u8 *create_raw_icmp(icmp *packet){
+    static u16 seq=1;
     if(!packet || !packet->data){
        
          return NULL;
@@ -28,6 +29,8 @@ u8 *create_raw_icmp(icmp *packet){
             return NULL;
     }
     rawpkt.checksum=0;
+    rawpkt.id=htons((u16)getpid());
+    rawpkt.sequence=htons(seq++);
     u16 total_size=sizeof(raw_icmp)+packet->size;
     if(total_size%2){
         total_size++;

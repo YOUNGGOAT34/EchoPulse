@@ -50,6 +50,8 @@ typedef struct raw_icmp{
      u8 type;
      u8 code;
      u16 checksum;
+     u16 id;
+     u16 sequence;
      u8 data[];
 }__attribute__((packed)) raw_icmp;
 
@@ -58,6 +60,7 @@ u8 *create_raw_icmp(icmp *packet);
 void error(const i8* msg);
 u16 checksum(u8 *data,size_t n);
 void print_icmp_packet(icmp *packet,u16);
+
 
 #endif
 

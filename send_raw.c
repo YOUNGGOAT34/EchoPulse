@@ -1,6 +1,7 @@
 #include "send_raw.h"
 
 void send_raw_ip(IP *packet){
+     struct timeval start,end;
      if(!packet){
        error("Cannot send a null packet\n");
      }
@@ -10,7 +11,7 @@ void send_raw_ip(IP *packet){
      }
 
      struct timeval tv;
-     tv.tv_sec = 4;
+     tv.tv_sec = 10;
      tv.tv_usec = 0;
      setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 
@@ -32,7 +33,7 @@ void send_raw_ip(IP *packet){
      if(packet->payload){
          size+=packet->payload->size;
      }
-
+      gettimeofday(&start,NULL);
      ssize_t bytes_sent=sendto(sockfd,raw_ip,size,0,(const struct sockaddr *)&dst,sizeof(dst));
      if(bytes_sent<0){
          error("sending raw ip packet\n");
@@ -42,7 +43,9 @@ void send_raw_ip(IP *packet){
 
      
      recv_ip_packet(sockfd);
-
+     gettimeofday(&end,NULL);
+     long rtt=((end.tv_sec-start.tv_sec)*1000L)+((end.tv_usec-start.tv_usec)/1000L);
+     printf("time=%ld ms\n",rtt);
      close(sockfd);
 
 
@@ -62,7 +65,15 @@ void recv_ip_packet(i32 sockfd){
    ssize_t bytes_received=recvfrom(sockfd,buffer,buff_len,0,(struct sockaddr *)&src_addr,&addr_len);
    
    if(bytes_received<0){
-      perror("Response Error\n");
+      if(errno==EAGAIN || errno==EWOULDBLOCK){
+         printf("Request timed out\n");
+        
+      }else if(errno==ECONNREFUSED){
+         printf("Connection refused\n");
+      }else{
+
+         error("Response Error\n");
+      }
       exit(1);
    }
 
@@ -78,8 +89,9 @@ void recv_ip_packet(i32 sockfd){
    }
 
    printf("%ld bytes ",bytes_received);
-   printf("from ");
-   // print_ip(packet->dst);
-   
+   printf("from %s: ",print_ip(src_addr.sin_addr.s_addr));
+   printf("icmp_seq=%hd ",ntohs(ricmp->sequence));
+  
+
 
 }
