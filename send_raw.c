@@ -45,7 +45,8 @@ void send_raw_ip(IP *packet){
      recv_ip_packet(sockfd);
      gettimeofday(&end,NULL);
      long rtt=((end.tv_sec-start.tv_sec)*1000L)+((end.tv_usec-start.tv_usec)/1000L);
-     printf("time=%ld ms\n",rtt);
+     printf("time=%ld ms\n"RESET,rtt);
+     printf("\n");
      close(sockfd);
 
 
@@ -66,10 +67,10 @@ void recv_ip_packet(i32 sockfd){
    
    if(bytes_received<0){
       if(errno==EAGAIN || errno==EWOULDBLOCK){
-         printf("Request timed out\n");
+         printf(RED"Request timed out\n"RESET);
         
       }else if(errno==ECONNREFUSED){
-         printf("Connection refused\n");
+         printf(RED"Connection refused\n"RESET);
       }else{
 
          error("Response Error\n");
@@ -81,16 +82,71 @@ void recv_ip_packet(i32 sockfd){
 
    raw_icmp *ricmp=(raw_icmp *)(buffer+(res->ihl*4));
 
-   if(ricmp->type==0){
-      printf(GREEN "Got ICMP Echo Reply from %s\n" RESET,
-         inet_ntoa(src_addr.sin_addr));
+   if(ricmp->type==0 && ricmp->code==0){
+        
+            printf(GREEN "%ld bytes ",bytes_received-(res->ihl*4));
+            printf("from %s: ",print_ip(src_addr.sin_addr.s_addr));
+            printf("icmp_seq=%hd ",ntohs(ricmp->sequence));
+         
+
    }else if(ricmp->type==3){
-      printf(RED "Destination Unreachable (code %d)\n" RESET, ricmp->code);
+      switch(ricmp->code){
+         //some cases will come up later as I advance the project,right now I'm just including all of them
+             case 0:
+             printf(RED"Destination network unreachable\n"RESET);
+                  exit(1);
+             case 1:
+             printf(RED"Destination host unreachable\n"RESET);
+                  exit(1);
+             case 2:
+             printf(RED"Destination protocal unreachable\n"RESET);
+                  exit(1);
+             case 3:
+             printf(RED"Destination port unreachable\n"RESET);
+                  exit(1);
+             case 4:
+             printf(RED"Fragmentation required, and DF flag set \n"RESET);
+                  exit(1);
+             case 5:
+             printf(RED"Source route failed \n"RESET);
+                  exit(1);
+             case 6:
+             printf(RED"Destination network unknown \n"RESET);
+                  exit(1);
+             case 7:
+             printf(RED"Destination host unknown \n"RESET);
+                  exit(1);
+             case 8:
+             printf(RED"Source host isolated \n"RESET);
+                  break;
+             case 9:
+             printf(RED"Network administratively prohibited \n"RESET);
+                  exit(1);
+             case 10:
+             printf(RED"Host administratively prohibited \n"RESET);
+                  break;
+             case 11:
+             printf(RED"Network unreachable for ToS\n"RESET);
+                  exit(1);
+             case 12:
+             printf(RED"Host unreachable for ToS\n"RESET);
+                  exit(1);
+             case 13:
+             printf(RED"Communication administratively prohibited\n"RESET);
+                  exit(1);
+             case 14:
+             printf(RED"Host Precedence Violation \n"RESET);
+                  exit(1);
+             case 15:
+             printf(RED"Precedence cutoff in effect\n"RESET);
+                  exit(1);
+
+            
+      }
+      
    }
 
-   printf("%ld bytes ",bytes_received-(res->ihl*4));
-   printf("from %s: ",print_ip(src_addr.sin_addr.s_addr));
-   printf("icmp_seq=%hd ",ntohs(ricmp->sequence));
+
   
 
 

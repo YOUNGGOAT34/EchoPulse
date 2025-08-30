@@ -13,28 +13,22 @@ int main(){
      u16 size=sizeof(raw_icmp)+data_size;
      if(!raw){
           printf("Empty\n");
+          exit(1);
      }
-     hexadump((void *)raw,size);
+   
 
      IP *pkt=create_ip_packet(ICMP,3000,"208.67.222.222");
      pkt->payload=packet;
 
      u8 *raw_bytes=create_raw_ip(pkt);
      u16 _size=sizeof(RAWIP)+sizeof(raw_icmp)+pkt->payload->size;
-     print_ip_packet(pkt);
-
-     hexadump(raw_bytes,_size);
-
+ 
      send_raw_ip(pkt);
 
      free(packet);
      free(pkt);
      free(raw);
      free(raw_bytes);
-
-     
-     
-    
 
      return 0;
 }
