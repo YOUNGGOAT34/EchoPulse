@@ -81,9 +81,9 @@ void recv_ip_packet(i32 sockfd){
    RAWIP *res=(RAWIP *)buffer;
 
    raw_icmp *ricmp=(raw_icmp *)(buffer+(res->ihl*4));
-
+    printf("\n");
    if(ricmp->type==0 && ricmp->code==0){
-        
+            
             printf(GREEN "%ld bytes ",bytes_received-(res->ihl*4));
             printf("from %s: ",print_ip(src_addr.sin_addr.s_addr));
             printf("icmp_seq=%hd ",ntohs(ricmp->sequence));

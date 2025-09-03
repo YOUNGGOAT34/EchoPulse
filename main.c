@@ -10,21 +10,21 @@ int main(){
      icmp *packet = create_icmp_packet(echo,data, data_size);
      // print_icmp_packet(packet, sizeof(icmp) + data_size);
      u8 *raw=create_raw_icmp(packet);
-     u16 size=sizeof(raw_icmp)+data_size;
+     // u16 size=sizeof(raw_icmp)+data_size;
      if(!raw){
           printf("Empty\n");
           exit(1);
      }
    
 
-     IP *pkt=create_ip_packet(ICMP,3000,"208.67.222.222");
+     IP *pkt=create_ip_packet(ICMP,3000,"192.168.0.101");
      pkt->payload=packet;
 
      u8 *raw_bytes=create_raw_ip(pkt);
-     u16 _size=sizeof(RAWIP)+sizeof(raw_icmp)+pkt->payload->size;
- 
-     send_raw_ip(pkt);
+     // u16 _size=sizeof(RAWIP)+sizeof(raw_icmp)+pkt->payload->size;
 
+     send_raw_ip(pkt);
+     //memory freeing
      free(packet);
      free(pkt);
      free(raw);
