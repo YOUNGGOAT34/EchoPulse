@@ -157,11 +157,12 @@ i8 *print_ip(u32 ip){
 }
 
 
+
+
 void print_ip_packet(IP *packet){
      if(!packet){
          error("Null IP packet\n");
      }
-
      printf("Type: %02hhx\n",packet->type);
      printf("id: %02hx\n",packet->id);
      printf("src: ");

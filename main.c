@@ -2,6 +2,12 @@
 
 #include "send_raw.h"
 
+/*
+  What if it can ping multiple hosts ,,and possibly ping the entire subnet???
+
+*/
+
+
 volatile sig_atomic_t keep_sending=0;
 
 void handle_sigInt(__attribute__((unused)) i32 sig){
@@ -50,6 +56,5 @@ int main(int argc,char *argv[]){
      free(pkt);
      free(raw);
      free(raw_bytes);
-
      return 0;
 }
