@@ -11,7 +11,7 @@ void send_raw_ip(IP *packet){
      }
 
      struct timeval tv;
-     tv.tv_sec = 10;
+     tv.tv_sec = 100;
      tv.tv_usec = 0;
      setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 

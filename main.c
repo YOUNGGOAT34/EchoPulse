@@ -3,7 +3,13 @@
 #include "send_raw.h"
 
 
-int main(){
+int main(int argc,char *argv[]){
+
+     if(argc<2){
+          fprintf(stderr,RED"Usage: ./main <destination ip address>\n"RESET);
+          exit(EXIT_SUCCESS);
+     }
+
      u8 *data = (u8 *)"Hello";
      u16 data_size = strlen((char *)data);
      
@@ -17,7 +23,10 @@ int main(){
      }
    
 
-     IP *pkt=create_ip_packet(ICMP,3000,"192.168.0.101");
+     char *ip=argv[1];
+
+     IP *pkt=create_ip_packet(ICMP,3000,ip);
+
      pkt->payload=packet;
 
      u8 *raw_bytes=create_raw_ip(pkt);
