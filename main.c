@@ -2,6 +2,12 @@
 
 #include "send_raw.h"
 
+volatile sig_atomic_t keep_sending=0;
+
+void handle_sigInt(__attribute__((unused)) i32 sig){
+    
+   keep_sending=1;
+}
 
 int main(int argc,char *argv[]){
 
@@ -9,6 +15,8 @@ int main(int argc,char *argv[]){
           fprintf(stderr,RED"Usage: ./main <destination ip address>\n"RESET);
           exit(EXIT_SUCCESS);
      }
+
+     signal(SIGINT,handle_sigInt);
 
      u8 *data = (u8 *)"Hello";
      u16 data_size = strlen((char *)data);
@@ -31,8 +39,10 @@ int main(int argc,char *argv[]){
 
      u8 *raw_bytes=create_raw_ip(pkt);
      // u16 _size=sizeof(RAWIP)+sizeof(raw_icmp)+pkt->payload->size;
+     while(!keep_sending){
 
-     send_raw_ip(pkt);
+          send_raw_ip(pkt);
+     }
      //memory freeing
      free(packet);
      free(pkt);

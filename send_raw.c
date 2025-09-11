@@ -11,10 +11,10 @@ void send_raw_ip(IP *packet){
      }
 
      struct timeval tv;
-     tv.tv_sec = 100;
+     tv.tv_sec = 2;
      tv.tv_usec = 0;
      setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
-
+     
      i32 one=1;
      if(setsockopt(sockfd,IPPROTO_IP,IP_HDRINCL,&one,sizeof(one))<0){
         error("Failed to set socket options\n");
@@ -56,9 +56,6 @@ void send_raw_ip(IP *packet){
 
 void recv_ip_packet(i32 sockfd){
   
-  
- 
-
    i8 buffer[65536];
    struct sockaddr_in src_addr;
    socklen_t addr_len=sizeof(src_addr);

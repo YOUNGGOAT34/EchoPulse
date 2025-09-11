@@ -2,6 +2,7 @@
 #define IP_H
 
 #include <arpa/inet.h>
+#include <signal.h>
 #include "icmp.h"
 
 typedef struct IP{
