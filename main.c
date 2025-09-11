@@ -3,8 +3,11 @@
 #include "send_raw.h"
 
 /*
+  Add host resolution
+  Add --ping--statistics--
+  add the ping thing to show that how man bytes we are pinging to a certain ip???????
   What if it can ping multiple hosts ,,and possibly ping the entire subnet???
-
+  
 */
 
 
