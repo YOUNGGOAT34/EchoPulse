@@ -42,6 +42,8 @@ int main(int argc,char *argv[]){
      while(!keep_sending){
 
           send_raw_ip(pkt);
+
+          sleep(1);
      }
      //memory freeing
      free(packet);
