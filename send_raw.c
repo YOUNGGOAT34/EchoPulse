@@ -72,7 +72,7 @@ void recv_ip_packet(i32 sockfd){
 
          error("Response Error\n");
       }
-      exit(1);
+     //  exit(1);
    }
 
    RAWIP *res=(RAWIP *)buffer;
