@@ -4,5 +4,6 @@
 #include "ip.h"
 
 void send_raw_ip(IP *);
-void recv_ip_packet(i32);
+ssize_t recv_ip_packet(i32);
+
 #endif

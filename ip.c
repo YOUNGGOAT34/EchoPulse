@@ -48,7 +48,6 @@ u32 get_local_ip(void){
 
 IP *create_ip_packet(const u8 type,u16 id,const i8 *dst){
       if(!dst){
-          
           return NULL;
       }
      
@@ -56,7 +55,7 @@ IP *create_ip_packet(const u8 type,u16 id,const i8 *dst){
       if(!packet){
           error("Failed to allocate memory for IP packet\n");
         }
-       
+        
         u32 src=get_local_ip();
        
       u32 dst_ip=inet_addr(dst);

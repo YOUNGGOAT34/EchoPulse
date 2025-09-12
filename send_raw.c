@@ -42,11 +42,14 @@ void send_raw_ip(IP *packet){
   
 
      
-     recv_ip_packet(sockfd);
+     ssize_t received_bytes=recv_ip_packet(sockfd);
      gettimeofday(&end,NULL);
      long rtt=((end.tv_sec-start.tv_sec)*1000L)+((end.tv_usec-start.tv_usec)/1000L);
-     printf("time=%ld ms\n"RESET,rtt);
-     printf("\n");
+     if(!(i64)(received_bytes<0)){
+
+          printf("time=%ld ms\n"RESET,rtt);
+          printf("\n");
+     }
      close(sockfd);
 
 
@@ -54,7 +57,7 @@ void send_raw_ip(IP *packet){
 }
 
 
-void recv_ip_packet(i32 sockfd){
+ssize_t recv_ip_packet(i32 sockfd){
   
    i8 buffer[65536];
    struct sockaddr_in src_addr;
@@ -64,12 +67,13 @@ void recv_ip_packet(i32 sockfd){
    
    if(bytes_received<0){
       if(errno==EAGAIN || errno==EWOULDBLOCK){
-         printf(RED"Request timed out\n"RESET);
-        
+     //     printf(RED"Request timed out %s\n"RESET,strerror(errno));
+         return bytes_received;
       }else if(errno==ECONNREFUSED){
          printf(RED"Connection refused\n"RESET);
+      }else if(errno==EINTR){
+           return bytes_received;
       }else{
-
          error("Response Error\n");
       }
      //  exit(1);
@@ -80,14 +84,13 @@ void recv_ip_packet(i32 sockfd){
    raw_icmp *ricmp=(raw_icmp *)(buffer+(res->ihl*4));
     printf("\n");
    if(ricmp->type==0 && ricmp->code==0){
-            if(bytes_received<0){
-                return;
-            }
+          //   if(bytes_received<0){
+          //       return bytes_received;
+          //   }
             printf(GREEN "%ld bytes ",bytes_received-(res->ihl*4));
             printf("from %s: ",print_ip(src_addr.sin_addr.s_addr));
             printf("icmp_seq=%hd ",ntohs(ricmp->sequence));
-         
-   
+            
    }else if(ricmp->type==3){
       switch(ricmp->code){
          //some cases will come up later as I advance the project,right now I'm just including all of them
@@ -145,8 +148,6 @@ void recv_ip_packet(i32 sockfd){
       
    }
 
-
-  
-
+  return bytes_received;
 
 }
