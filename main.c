@@ -69,6 +69,8 @@ int main(int argc,char *argv[]){
            100.0*(stats->packets_sent-stats->packets_received)/stats->packets_sent,
            stats->duration_ms
      );
+
+     printf("rtt min/avg/max/mdev=%lld/%lld/%lld/%lld ms\n",stats->min_rtt,stats->avg_rtt,stats->max_rtt,stats->mdev_rtt);
       
      //memory freeing
      free(pkt);
@@ -76,4 +78,5 @@ int main(int argc,char *argv[]){
      free(packet);
      free(raw);
      return 0;
+
 }

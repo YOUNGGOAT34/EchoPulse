@@ -1,5 +1,19 @@
 #include "send_raw.h"
 
+void add_rtt(RTTsBuffer *rtts,long rtt){
+    if(rtts->count==rtts->capacity){
+        rtts->capacity=(rtts->capacity==0)?16:rtts->capacity*2;
+        rtts->rtts=realloc(rtts->rtts,rtts->capacity *sizeof(long));
+
+        if(!rtts->rtts){
+           fprintf(stderr,"Failed to allocate memory for rtts buffer: \n");
+           return;
+        }
+    }
+
+    rtts->rtts[rtts->count++]=rtt;
+}
+
 
 
 STATS *send_packets(IP *pkt,volatile sig_atomic_t *sig){
@@ -8,19 +22,37 @@ STATS *send_packets(IP *pkt,volatile sig_atomic_t *sig){
      stats->packets_received=0;
      stats->packets_sent=0;
      stats->duration_ms=0;
-
+     stats->min_rtt=INT_MAX;
+     stats->max_rtt=INT_MIN;
+     stats->total_rtt=0;
+     stats->mdev_rtt=0;
+      
+     RTTsBuffer *rttbuffer=malloc(sizeof(RTTsBuffer));
+     rttbuffer->capacity=0;
+     rttbuffer->count=0;
      while(!(*sig)){
-          send_raw_ip(pkt,stats);
+          send_raw_ip(pkt,stats,rttbuffer);
           sleep(1);
      }
 
-  
      
+     
+     stats->avg_rtt=stats->total_rtt/stats->packets_received;
+
+     i64 sum_dev=0;
+     for(i64 i=0;i<rttbuffer->count;i++){
+          i64 diff=rttbuffer->rtts[i]-stats->avg_rtt;
+          sum_dev+=(diff>0)?diff:-diff;
+     }
+
+     stats->mdev_rtt=sum_dev/stats->packets_received;
+
      return stats;
 }
 
 
-void send_raw_ip(IP *packet,STATS *stats){
+
+void send_raw_ip(IP *packet,STATS *stats,RTTsBuffer *rtts){
      struct timeval start,end;
      if(!packet){
        error("Cannot send a null packet\n");
@@ -61,10 +93,15 @@ void send_raw_ip(IP *packet,STATS *stats){
 
      
      
-     
      ssize_t received_bytes=recv_ip_packet(sockfd);
      gettimeofday(&end,NULL);
+     
      long rtt=((end.tv_sec-start.tv_sec)*1000L)+((end.tv_usec-start.tv_usec)/1000L);
+     add_rtt(rtts,rtt);
+     stats->min_rtt=(rtt<stats->min_rtt)?rtt:stats->min_rtt;
+     stats->max_rtt=(rtt>stats->max_rtt)?rtt:stats->max_rtt;
+     stats->total_rtt+=rtt;
+     
      stats->duration_ms+=rtt;
      stats->packets_sent++;
      if(received_bytes>=0){
