@@ -4,7 +4,7 @@ u32 get_local_ip(void){
     int sockfd=socket(AF_INET,SOCK_STREAM,0);
 
     if(sockfd<0) error("Failed to create a socket for local ip retrivin\n");
-
+   
     struct sockaddr_in server;
     memset(&server,0,sizeof(server));
     server.sin_family=AF_INET;
@@ -21,13 +21,14 @@ u32 get_local_ip(void){
     if(getsockname(sockfd,(struct sockaddr *)&local,&len)==-1){
         error("Error while getting the local socket information\n");
     }
-
+    
+    
     u32 ip=local.sin_addr.s_addr;
 
     if(ip==INADDR_ANY || ip==INADDR_NONE){
         error("Invalid local ip: wildcard or none\n");
     }
-
+ 
     u32 host_ip=ntohl(ip);
     const u8 a=(host_ip>>24)&0xFF;
 
@@ -47,23 +48,23 @@ u32 get_local_ip(void){
 
 IP *create_ip_packet(const u8 type,u16 id,const i8 *dst){
       if(!dst){
+          
           return NULL;
       }
-
+     
       IP *packet=(IP *)malloc(sizeof(IP));
       if(!packet){
           error("Failed to allocate memory for IP packet\n");
         }
-        
+       
         u32 src=get_local_ip();
        
       u32 dst_ip=inet_addr(dst);
-      
       if(dst_ip==INADDR_NONE){
          error("invalid destination ip address\n");
       }
       memset(packet,0,sizeof(IP));
-       
+      
       packet->dst=dst_ip;
       packet->id=id;
       packet->src=src;
@@ -142,6 +143,7 @@ u8 *create_raw_ip(IP *packet){
 
 
 i8 *print_ip(u32 ip){
+    ip=ntohl(ip);
     i8 *str=malloc(16);
     if(!str){
          error("Failed to allocate memory for the IP return string\n");
@@ -155,8 +157,6 @@ i8 *print_ip(u32 ip){
 
     return str;
 }
-
-
 
 
 void print_ip_packet(IP *packet){

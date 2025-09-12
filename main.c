@@ -18,13 +18,14 @@ void handle_sigInt(__attribute__((unused)) i32 sig){
    keep_sending=1;
 }
 
+
 int main(int argc,char *argv[]){
 
      if(argc<2){
           fprintf(stderr,RED"Usage: ./main <destination ip address>\n"RESET);
           exit(EXIT_SUCCESS);
      }
-
+     
      signal(SIGINT,handle_sigInt);
 
      u8 *data = (u8 *)"Hello";
@@ -39,25 +40,26 @@ int main(int argc,char *argv[]){
           exit(1);
      }
    
-
-     char *ip=argv[1];
-
-     IP *pkt=create_ip_packet(ICMP,3000,ip);
-
-     pkt->payload=packet;
-
-     u8 *raw_bytes=create_raw_ip(pkt);
-     // u16 _size=sizeof(RAWIP)+sizeof(raw_icmp)+pkt->payload->size;
-     while(!keep_sending){
-
-          send_raw_ip(pkt);
-
-          sleep(1);
+     for(int i=1;i<argc;i++){
+          
+               char *ip=argv[i];
+          
+               IP *pkt=create_ip_packet(ICMP,3000,ip);
+          
+               pkt->payload=packet;
+          
+               u8 *raw_bytes=create_raw_ip(pkt);
+               // u16 _size=sizeof(RAWIP)+sizeof(raw_icmp)+pkt->payload->size;
+               while(!keep_sending){
+                    send_raw_ip(pkt);
+                    sleep(1);
+               }
+               free(pkt);
+               free(raw_bytes);
      }
+
      //memory freeing
      free(packet);
-     free(pkt);
      free(raw);
-     free(raw_bytes);
      return 0;
 }
