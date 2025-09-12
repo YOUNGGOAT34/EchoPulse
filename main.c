@@ -40,25 +40,39 @@ int main(int argc,char *argv[]){
           exit(1);
      }
    
-     for(int i=1;i<argc;i++){
+     // for(int i=1;i<argc;i++){
           
-               char *ip=argv[i];
-          
-               IP *pkt=create_ip_packet(ICMP,3000,ip);
-          
-               pkt->payload=packet;
-          
-               u8 *raw_bytes=create_raw_ip(pkt);
-               // u16 _size=sizeof(RAWIP)+sizeof(raw_icmp)+pkt->payload->size;
-               while(!keep_sending){
-                    send_raw_ip(pkt);
-                    sleep(1);
-               }
-               free(pkt);
-               free(raw_bytes);
-     }
+              
+     // }
 
+     char *ip=argv[1];
+          
+     IP *pkt=create_ip_packet(ICMP,3000,ip);
+
+     pkt->payload=packet;
+
+     u8 *raw_bytes=create_raw_ip(pkt);
+     // u16 _size=sizeof(RAWIP)+sizeof(raw_icmp)+pkt->payload->size;
+     // while(!keep_sending){
+     //      send_raw_ip(pkt);
+     //      sleep(1);
+     // }
+  
+      
+     STATS *stats=send_packets(pkt,&keep_sending);
+     
+     printf("\n");
+     printf("---%s statistics---\n %lld packets transmitted, %lld received, %.1f%% packet loss,time %lldms\n",
+           print_ip(inet_addr(ip)),
+           stats->packets_sent,
+           stats->packets_received,
+           100.0*(stats->packets_sent-stats->packets_received)/stats->packets_sent,
+           stats->duration_ms
+     );
+      
      //memory freeing
+     free(pkt);
+     free(raw_bytes);
      free(packet);
      free(raw);
      return 0;

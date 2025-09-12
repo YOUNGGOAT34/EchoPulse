@@ -1,6 +1,25 @@
 #include "send_raw.h"
 
-void send_raw_ip(IP *packet){
+
+
+STATS *send_packets(IP *pkt,volatile sig_atomic_t *sig){
+     STATS *stats=malloc(sizeof(STATS));
+     i64 packets_sent=0;
+     i64 packets_received=0;
+     i64 duration_ms=0;
+     while(!(*sig)){
+          send_raw_ip(pkt,&packets_sent,&packets_received,&duration_ms);
+          sleep(1);
+     }
+
+     stats->packets_received=packets_received;
+     stats->packets_sent=packets_sent;
+     stats->duration_ms=duration_ms;
+     
+     return stats;
+}
+
+void send_raw_ip(IP *packet,i64 *packets_sent,i64 *packets_received,i64 *duration){
      struct timeval start,end;
      if(!packet){
        error("Cannot send a null packet\n");
@@ -11,7 +30,7 @@ void send_raw_ip(IP *packet){
      }
 
      struct timeval tv;
-     tv.tv_sec = 2;
+     tv.tv_sec = 1;
      tv.tv_usec = 0;
      setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
      
@@ -39,21 +58,24 @@ void send_raw_ip(IP *packet){
          error("sending raw ip packet\n");
      }
 
-  
-
+     
+     
      
      ssize_t received_bytes=recv_ip_packet(sockfd);
      gettimeofday(&end,NULL);
      long rtt=((end.tv_sec-start.tv_sec)*1000L)+((end.tv_usec-start.tv_usec)/1000L);
-     if(!(i64)(received_bytes<0)){
-
+     (*duration)+=rtt;
+     (*packets_sent)++;
+     if(received_bytes>=0){
+          (*packets_received)++;
           printf("time=%ld ms\n"RESET,rtt);
           printf("\n");
      }
+
+     free(raw_ip);
+
      close(sockfd);
-
-
-     
+  
 }
 
 
