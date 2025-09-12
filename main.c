@@ -62,7 +62,7 @@ int main(int argc,char *argv[]){
      STATS *stats=send_packets(pkt,&keep_sending);
      
      printf("\n");
-     printf("---%s statistics---\n %lld packets transmitted, %lld received, %.1f%% packet loss,time %lldms\n",
+     printf(YELLOW"---%s statistics---\n %lld packets transmitted, %lld received, %.1f%% packet loss,time %lldms\n",
            print_ip(inet_addr(ip)),
            stats->packets_sent,
            stats->packets_received,
@@ -70,8 +70,8 @@ int main(int argc,char *argv[]){
            stats->duration_ms
      );
 
-     printf("rtt min/avg/max/mdev=%lld/%lld/%lld/%lld ms\n",stats->min_rtt,stats->avg_rtt,stats->max_rtt,stats->mdev_rtt);
-      
+     printf("rtt min/avg/max/mdev=%lld/%lld/%lld/%lld ms\n"RESET,stats->min_rtt,stats->avg_rtt,stats->max_rtt,stats->mdev_rtt);
+     printf("\n");
      //memory freeing
      free(pkt);
      free(raw_bytes);
