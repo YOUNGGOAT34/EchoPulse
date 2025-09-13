@@ -38,7 +38,7 @@ STATS *send_packets(IP *pkt,volatile sig_atomic_t *sig){
      
      stats->avg_rtt=stats->total_rtt/stats->packets_received;
 
-     i64 sum_dev=0;
+     double sum_dev=0;
      for(i64 i=0;i<rttbuffer->count;i++){
           i64 diff=rttbuffer->rtts[i]-stats->avg_rtt;
           sum_dev+=(diff>0)?diff:-diff;
@@ -107,7 +107,7 @@ void send_raw_ip(IP *packet,STATS *stats,RTTsBuffer *rtts){
           stats->duration_ms+=rtt;
          
           stats->packets_received++;
-          printf("time=%ld ms "RESET,rtt);
+          printf("time=%.1f ms "RESET,rtt);
           printf("\n");
      }
 

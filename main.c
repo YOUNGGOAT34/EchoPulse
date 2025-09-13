@@ -66,17 +66,13 @@ int main(int argc,char *argv[]){
      pkt->payload=packet;
 
      u8 *raw_bytes=create_raw_ip(pkt);
-     // u16 _size=sizeof(RAWIP)+sizeof(raw_icmp)+pkt->payload->size;
-     // while(!keep_sending){
-     //      send_raw_ip(pkt);
-     //      sleep(1);
-     // }
+ 
   
       
      STATS *stats=send_packets(pkt,&keep_sending);
      
      printf("\n");
-     printf(YELLOW"---%s PINGv1 statistics---\n %lld packets transmitted, %lld received, %.1f%% packet loss,time %lldms\n",
+     printf(YELLOW"---%s PINGv1 statistics---\n %lld packets transmitted, %lld received, %.1f%% packet loss,time %.1fms\n",
            print_ip(inet_addr(ip)),
            stats->packets_sent,
            stats->packets_received,
@@ -84,7 +80,7 @@ int main(int argc,char *argv[]){
            stats->duration_ms
      );
 
-     printf("rtt min/avg/max/mdev=%lld/%lld/%lld/%lld ms\n"RESET,stats->min_rtt,stats->avg_rtt,stats->max_rtt,stats->mdev_rtt);
+     printf("rtt min/avg/max/mdev=%.3f/%.3f/%.3f/%.3f ms\n"RESET,stats->min_rtt,stats->avg_rtt,stats->max_rtt,stats->mdev_rtt);
      printf("\n");
      //memory freeing
      free(stats);

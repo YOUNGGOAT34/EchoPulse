@@ -7,12 +7,12 @@ typedef struct{
     i64 packets_sent;
     i64 packets_received;
 
-    i64 duration_ms;
-    i64 min_rtt;
-    i64 max_rtt;
-    i64 total_rtt;
-    i64 avg_rtt;
-    i64 mdev_rtt;
+    double duration_ms;
+    double min_rtt;
+    double max_rtt;
+    double total_rtt;
+    double avg_rtt;
+    double mdev_rtt;
 
 }STATS; 
 
