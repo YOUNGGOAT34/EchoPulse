@@ -16,7 +16,6 @@
 volatile sig_atomic_t keep_sending=0;
 
 void handle_sigInt(__attribute__((unused)) i32 sig){
-    
    keep_sending=1;
 }
 
@@ -50,9 +49,8 @@ int main(int argc,char *argv[]){
      hints.ai_family=AF_INET;
      hints.ai_socktype=SOCK_RAW;
      hints.ai_protocol=IPPROTO_ICMP;
-
      i32 status=getaddrinfo(argv[1],NULL,&hints,&res);
-
+     
      if(status!=0){
           fprintf(stderr,RED"Error getting address info %s \n"RESET,gai_strerror(status));
           exit(EXIT_FAILURE);

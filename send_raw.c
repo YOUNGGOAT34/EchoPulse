@@ -95,20 +95,23 @@ void send_raw_ip(IP *packet,STATS *stats,RTTsBuffer *rtts){
      ssize_t received_bytes=recv_ip_packet(sockfd);
      gettimeofday(&end,NULL);
      
-     long rtt=((end.tv_sec-start.tv_sec)*1000L)+((end.tv_usec-start.tv_usec)/1000L);
-     add_rtt(rtts,rtt);
-     stats->min_rtt=(rtt<stats->min_rtt)?rtt:stats->min_rtt;
-     stats->max_rtt=(rtt>stats->max_rtt)?rtt:stats->max_rtt;
-     stats->total_rtt+=rtt;
-     
-     stats->duration_ms+=rtt;
+     double rtt=((end.tv_sec-start.tv_sec)*1000.0L)+((end.tv_usec-start.tv_usec)/1000.0L);
      stats->packets_sent++;
      if(received_bytes>=0){
+          add_rtt(rtts,rtt);
+          stats->min_rtt=(rtt<stats->min_rtt)?rtt:stats->min_rtt;
+          stats->max_rtt=(rtt>stats->max_rtt)?rtt:stats->max_rtt;
+          
+          stats->total_rtt+=rtt;
+          
+          stats->duration_ms+=rtt;
+         
           stats->packets_received++;
-          printf("time=%ld ms\n"RESET,rtt);
+          printf("time=%ld ms "RESET,rtt);
           printf("\n");
      }
 
+     
      free(raw_ip);
 
      close(sockfd);
