@@ -44,8 +44,8 @@ STATS *send_packets(IP *pkt,volatile sig_atomic_t *sig){
           sum_dev+=(diff>0)?diff:-diff;
      }
 
-     stats->mdev_rtt=sum_dev/stats->packets_received;
-
+     stats->mdev_rtt=(stats->packets_received>0)? sum_dev/stats->packets_received :0;
+     
      return stats;
 }
 

@@ -89,6 +89,8 @@ int main(int argc,char *argv[]){
      printf("rtt min/avg/max/mdev=%lld/%lld/%lld/%lld ms\n"RESET,stats->min_rtt,stats->avg_rtt,stats->max_rtt,stats->mdev_rtt);
      printf("\n");
      //memory freeing
+     free(stats);
+     freeaddrinfo(res);
      free(pkt);
      free(raw_bytes);
      free(packet);
