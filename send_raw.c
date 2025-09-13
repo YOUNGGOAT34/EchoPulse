@@ -91,7 +91,9 @@ void send_raw_ip(IP *packet,STATS *stats,RTTsBuffer *rtts){
          error("sending raw ip packet\n");
      }
 
-     
+     RAWIP *ip_header=(RAWIP *)raw_ip;
+
+     printf(GREEN"Sending %ld bytes to %s \n"RESET,(bytes_sent-(ip_header->ihl*4)),print_ip(packet->dst));
      
      ssize_t received_bytes=recv_ip_packet(sockfd);
      gettimeofday(&end,NULL);
