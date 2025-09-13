@@ -36,7 +36,6 @@ STATS *send_packets(IP *pkt,volatile sig_atomic_t *sig){
      }
 
      
-     
      stats->avg_rtt=stats->total_rtt/stats->packets_received;
 
      i64 sum_dev=0;

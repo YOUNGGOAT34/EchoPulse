@@ -3,8 +3,10 @@
 #include "send_raw.h"
 
 /*
-  Add host resolution
-  Add --ping--statistics--
+
+  add network use cases.
+  name resolution
+
   add the ping thing to show that how man bytes we are pinging to a certain ip???????
   What if it can ping multiple hosts ,,and possibly ping the entire subnet???
   
@@ -40,13 +42,27 @@ int main(int argc,char *argv[]){
           exit(1);
      }
    
-     // for(int i=1;i<argc;i++){
-          
-              
-     // }
+    
+     struct addrinfo hints,*res;
+     
+     memset(&hints,0,sizeof(hints));
 
-     char *ip=argv[1];
-          
+     hints.ai_family=AF_INET;
+     hints.ai_socktype=SOCK_RAW;
+     hints.ai_protocol=IPPROTO_ICMP;
+
+     i32 status=getaddrinfo(argv[1],NULL,&hints,&res);
+
+     if(status!=0){
+          fprintf(stderr,RED"Error getting address info %s \n"RESET,gai_strerror(status));
+          exit(EXIT_FAILURE);
+     }
+
+     char ip[INET_ADDRSTRLEN];
+
+
+     struct sockaddr_in *addr=(struct sockaddr_in *)res->ai_addr;
+     inet_ntop(AF_INET, &(addr->sin_addr), ip, sizeof(ip));
      IP *pkt=create_ip_packet(ICMP,3000,ip);
 
      pkt->payload=packet;
@@ -62,7 +78,7 @@ int main(int argc,char *argv[]){
      STATS *stats=send_packets(pkt,&keep_sending);
      
      printf("\n");
-     printf(YELLOW"---%s statistics---\n %lld packets transmitted, %lld received, %.1f%% packet loss,time %lldms\n",
+     printf(YELLOW"---%s PINGv1 statistics---\n %lld packets transmitted, %lld received, %.1f%% packet loss,time %lldms\n",
            print_ip(inet_addr(ip)),
            stats->packets_sent,
            stats->packets_received,
