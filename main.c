@@ -3,12 +3,8 @@
 #include "send_raw.h"
 
 /*
-
   add network use cases.
-  add the ping thing to show that how man bytes we are pinging to a certain ip???????
-
   What if it can ping multiple hosts ,,and possibly ping the entire subnet???
-  
 */
 
 
@@ -67,7 +63,8 @@ int main(int argc,char *argv[]){
      u8 *raw_bytes=create_raw_ip(pkt);
  
   
-      
+     printf(GREEN"Sending %hd bytes to %s \n"RESET,data_size,print_ip(inet_addr(ip)));
+
      STATS *stats=send_packets(pkt,&keep_sending);
      
      printf("\n");
@@ -81,6 +78,21 @@ int main(int argc,char *argv[]){
 
      printf("rtt min/avg/max/mdev=%.3f/%.3f/%.3f/%.3f ms\n"RESET,stats->min_rtt,stats->avg_rtt,stats->max_rtt,stats->mdev_rtt);
      printf("\n");
+
+     printf("\t\tInterpretation \n");
+     
+     if(stats->avg_rtt<50 && stats->mdev_rtt<10 && (100.0*(stats->packets_sent-stats->packets_received)/stats->packets_sent)==0 ){
+          printf(" Super responsive ,ideal for gaming, voIp and other tasks that require stable connection\n");
+     }else if((stats->avg_rtt>=50 && stats->avg_rtt<=100) && stats->mdev_rtt<20 && (100.0*(stats->packets_sent-stats->packets_received)/stats->packets_sent)<1){
+          printf("GOOD\n");
+     }else if((stats->avg_rtt>=100 && stats->avg_rtt<=250) && stats->mdev_rtt<50 && (100.0*(stats->packets_sent-stats->packets_received)/stats->packets_sent)<2){
+          printf("MODERATE\n");
+     }else{
+          printf("POOR\n");
+     }
+     
+     printf("\n");
+
      //memory freeing
      free(stats);
      freeaddrinfo(res);
@@ -88,6 +100,8 @@ int main(int argc,char *argv[]){
      free(raw_bytes);
      free(packet);
      free(raw);
+
+
      return 0;
 
 }
