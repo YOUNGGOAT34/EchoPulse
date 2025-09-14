@@ -3,8 +3,9 @@
 #include "send_raw.h"
 
 /*
-  add network use cases.
+  
   What if it can ping multiple hosts ,,and possibly ping the entire subnet???
+  
 */
 
 
@@ -79,8 +80,8 @@ int main(int argc,char *argv[]){
      printf("rtt min/avg/max/mdev=%.3f/%.3f/%.3f/%.3f ms\n"RESET,stats->min_rtt,stats->avg_rtt,stats->max_rtt,stats->mdev_rtt);
      printf("\n");
 
-     printf("\t\tConnection Quality Interpretation\n");
-     printf("\t--------------------------------------------------\n");
+     printf(WHITE"\t\tConnection Quality Interpretation\n");
+     printf("\t--------------------------------------------------\n"RESET);
 
      if(stats->avg_rtt < 50 && stats->mdev_rtt < 10 &&
                (100.0 * (stats->packets_sent - stats->packets_received) / stats->packets_sent) == 0) {
@@ -101,7 +102,7 @@ int main(int argc,char *argv[]){
           printf(RED"\tDescription : High latency or packet loss. Not suitable for demanding network tasks.\n"RESET);
      }
 
-          printf("\t--------------------------------------------------\n\n");
+          printf(WHITE"\t--------------------------------------------------\n\n"RESET);
 
 
      //memory freeing
