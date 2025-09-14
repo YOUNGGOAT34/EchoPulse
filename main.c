@@ -79,19 +79,30 @@ int main(int argc,char *argv[]){
      printf("rtt min/avg/max/mdev=%.3f/%.3f/%.3f/%.3f ms\n"RESET,stats->min_rtt,stats->avg_rtt,stats->max_rtt,stats->mdev_rtt);
      printf("\n");
 
-     printf("\t\tInterpretation \n");
-     
-     if(stats->avg_rtt<50 && stats->mdev_rtt<10 && (100.0*(stats->packets_sent-stats->packets_received)/stats->packets_sent)==0 ){
-          printf(" Super responsive ,ideal for gaming, voIp and other tasks that require stable connection\n");
-     }else if((stats->avg_rtt>=50 && stats->avg_rtt<=100) && stats->mdev_rtt<20 && (100.0*(stats->packets_sent-stats->packets_received)/stats->packets_sent)<1){
-          printf("GOOD\n");
-     }else if((stats->avg_rtt>=100 && stats->avg_rtt<=250) && stats->mdev_rtt<50 && (100.0*(stats->packets_sent-stats->packets_received)/stats->packets_sent)<2){
-          printf("MODERATE\n");
-     }else{
-          printf("POOR\n");
+     printf("\t\tConnection Quality Interpretation\n");
+     printf("\t--------------------------------------------------\n");
+
+     if(stats->avg_rtt < 50 && stats->mdev_rtt < 10 &&
+               (100.0 * (stats->packets_sent - stats->packets_received) / stats->packets_sent) == 0) {
+          printf(GREEN"\tStatus      : EXCELLENT\n"RESET);
+          printf(GREEN"\tDescription : Super responsive. Ideal for gaming, VoIP, and other latency-sensitive tasks.\n"RESET);
+     } else if ((stats->avg_rtt >= 50 && stats->avg_rtt <= 100) &&
+               stats->mdev_rtt < 20 &&
+               (100.0 * (stats->packets_sent - stats->packets_received) / stats->packets_sent) < 1) {
+          printf(CYAN"\tStatus      : GOOD\n"RESET);
+          printf(CYAN"\tDescription : Reliable connection. Suitable for most online activities.\n"RESET);
+     } else if ((stats->avg_rtt >= 100 && stats->avg_rtt <= 250) &&
+               stats->mdev_rtt < 50 &&
+               (100.0 * (stats->packets_sent - stats->packets_received) / stats->packets_sent) < 2) {
+          printf(YELLOW"\tStatus      : MODERATE\n"RESET);
+          printf(YELLOW"\tDescription : Acceptable for browsing and streaming. May struggle with real-time applications.\n"RESET);
+     } else {
+          printf(RED"\tStatus      : POOR\n"RESET);
+          printf(RED"\tDescription : High latency or packet loss. Not suitable for demanding network tasks.\n"RESET);
      }
-     
-     printf("\n");
+
+          printf("\t--------------------------------------------------\n\n");
+
 
      //memory freeing
      free(stats);

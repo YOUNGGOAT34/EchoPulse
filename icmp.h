@@ -21,6 +21,7 @@
 #define GREEN   "\033[1;32m"
 #define YELLOW "\e[0;33m"
 #define RESET "\033[0m"
+#define CYAN "\033[1;36m"
 
 
 typedef unsigned long long int u64;
