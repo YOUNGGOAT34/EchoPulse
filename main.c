@@ -29,7 +29,6 @@ int main(i32 argc,i8 *argv[]){
 
 }
 
-
 void command_parser(i8 argc,i8 *argv[]){
     
      if(argc<2){
@@ -37,14 +36,11 @@ void command_parser(i8 argc,i8 *argv[]){
           exit(EXIT_SUCCESS);
      }
       
-
-
    static struct option long_options[]={
      {"count",required_argument,0,'c'},
      {"help",no_argument,0,'h'},
      {0,0,0,0}
    };
-
 
 
    double_hyphen(argc,argv);
@@ -53,9 +49,9 @@ void command_parser(i8 argc,i8 *argv[]){
    u16 data_size = strlen((char *)data);
    
    icmp *packet = create_icmp_packet(echo,data, data_size);
-   // print_icmp_packet(packet, sizeof(icmp) + data_size);
+
    u8 *raw=create_raw_icmp(packet);
-   // u16 size=sizeof(raw_icmp)+data_size;
+ 
    if(!raw){
         printf("Empty\n");
         exit(1);
@@ -108,11 +104,10 @@ void command_parser(i8 argc,i8 *argv[]){
         }
    }
 
- 
+   /*
+      Formatted output 
+   */
 
-   
-
-     
      printf("\n");
      printf(YELLOW"---%s PINGv1 statistics---\n %lld packets transmitted, %lld received, %.1f%% packet loss,time %.1fms\n",
            print_ip(inet_addr(ip)),
