@@ -41,11 +41,27 @@ void command_parser(i8 argc,i8 *argv[]){
 
    static struct option long_options[]={
      {"count",required_argument,0,'c'},
+     {"help",no_argument,0,'h'},
      {0,0,0,0}
    };
 
 
+
    double_hyphen(argc,argv);
+   
+   i32 option;
+   i32 options_index=0;
+
+   while((option=getopt_long(argc-1,argv,"c:h",long_options,&options_index))!=-1){
+        switch(option){
+            case 'h':
+               help();
+               break;
+            default:
+              fprintf(stderr,RED"Unknown option\n"RESET);
+              exit(EXIT_FAILURE);
+        }
+   }
 
    return;
 
