@@ -1,11 +1,9 @@
-#include "hexadump.h"
-
-#include "send_raw.h"
+#include <main.h>
 
 /*
   
   What if it can ping multiple hosts ,,and possibly ping the entire subnet???
-  
+
 */
 
 
@@ -63,8 +61,8 @@ int main(int argc,char *argv[]){
 
      u8 *raw_bytes=create_raw_ip(pkt);
  
-  
-     printf(GREEN"Sending %hd bytes to %s \n"RESET,data_size,print_ip(inet_addr(ip)));
+    
+     printf(GREEN"\nSending %hd bytes to %s \n"RESET,data_size,print_ip(inet_addr(ip)));
 
      STATS *stats=send_packets(pkt,&keep_sending);
      
@@ -115,5 +113,10 @@ int main(int argc,char *argv[]){
 
 
      return 0;
+
+}
+
+
+void command_parser(void){
 
 }
