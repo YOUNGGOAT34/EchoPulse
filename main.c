@@ -33,7 +33,7 @@ int main(i32 argc,i8 *argv[]){
 void command_parser(i8 argc,i8 *argv[]){
     
      if(argc<2){
-          fprintf(stderr,RED"Usage: ./main <destination ip address>\n"RESET);
+          help();
           exit(EXIT_SUCCESS);
      }
       
@@ -45,6 +45,7 @@ void command_parser(i8 argc,i8 *argv[]){
    };
 
 
+   return;
 
   u8 *data = (u8 *)"Hello";
      u16 data_size = strlen((char *)data);
@@ -134,22 +135,14 @@ void command_parser(i8 argc,i8 *argv[]){
      free(packet);
      free(raw);
 
-
-
 }
 
 
 
-// void help(){
-//      printf("Usage: ./main <interface> [options]\n");
-//      printf("Options:\n");
-//      printf("  -c, --change <MAC>     Change MAC address\n");
-//      printf("  -r, --random           Generate random MAC\n");
-//      printf("  -R, --restore          Restore original MAC\n");
-//      printf("  -p, --print [type]     Print MAC (optional type)\n");
-//      printf("  -P, --permanent        Use permanent MAC\n");
-//      printf("  -d, --down             bring an interface down\n");
-//      printf("  -u, --up               bring an interface up\n");
-//      printf("  -h, --help             Show this help message\n");
-//      exit(0);
-//   }
+void help(){
+     
+     printf(WHITE"\n\tUsage: ./main [options] <destination name or ip> \n");
+     printf("\tOptions:\n");
+     printf(" \t-c, --count <number of packets>  send a specific number of packets\n\n"RESET);
+     exit(EXIT_SUCCESS);
+  }
