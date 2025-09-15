@@ -48,6 +48,47 @@ void command_parser(i8 argc,i8 *argv[]){
 
 
    double_hyphen(argc,argv);
+
+   u8 *data = (u8 *)"Hello";
+   u16 data_size = strlen((char *)data);
+   
+   icmp *packet = create_icmp_packet(echo,data, data_size);
+   // print_icmp_packet(packet, sizeof(icmp) + data_size);
+   u8 *raw=create_raw_icmp(packet);
+   // u16 size=sizeof(raw_icmp)+data_size;
+   if(!raw){
+        printf("Empty\n");
+        exit(1);
+   }
+ 
+  
+   struct addrinfo hints,*res;
+   
+   memset(&hints,0,sizeof(hints));
+
+   hints.ai_family=AF_INET;
+   hints.ai_socktype=SOCK_RAW;
+   hints.ai_protocol=IPPROTO_ICMP;
+   i32 status=getaddrinfo(argv[argc-1],NULL,&hints,&res);
+   
+   char ip[INET_ADDRSTRLEN];
+   struct sockaddr_in *addr=(struct sockaddr_in *)res->ai_addr;
+   inet_ntop(AF_INET, &(addr->sin_addr), ip, sizeof(ip));
+
+   if(status!=0){
+        fprintf(stderr,RED"Error getting address info %s \n"RESET,gai_strerror(status));
+        exit(EXIT_FAILURE);
+   }
+
+   IP *pkt=create_ip_packet(ICMP,3000,ip);
+
+   pkt->payload=packet;
+   u8 *raw_bytes=create_raw_ip(pkt);
+
+   STATS *stats;;
+
+   printf(GREEN"\nSending %hd bytes to %s \n"RESET,data_size,print_ip(inet_addr(ip)));
+
    
    i32 option;
    i32 options_index=0;
@@ -57,56 +98,20 @@ void command_parser(i8 argc,i8 *argv[]){
             case 'h':
                help();
                break;
+            case 'c':
+               i32 count=(i32)strtol(optarg,NULL,0);
+               stats=send_n_packets(pkt,count);
+                break;
             default:
               fprintf(stderr,RED"Unknown option\n"RESET);
               exit(EXIT_FAILURE);
         }
    }
 
-   return;
-
-  u8 *data = (u8 *)"Hello";
-     u16 data_size = strlen((char *)data);
-     
-     icmp *packet = create_icmp_packet(echo,data, data_size);
-     // print_icmp_packet(packet, sizeof(icmp) + data_size);
-     u8 *raw=create_raw_icmp(packet);
-     // u16 size=sizeof(raw_icmp)+data_size;
-     if(!raw){
-          printf("Empty\n");
-          exit(1);
-     }
-   
-    
-     struct addrinfo hints,*res;
-     
-     memset(&hints,0,sizeof(hints));
-
-     hints.ai_family=AF_INET;
-     hints.ai_socktype=SOCK_RAW;
-     hints.ai_protocol=IPPROTO_ICMP;
-     i32 status=getaddrinfo(argv[1],NULL,&hints,&res);
-     
-     if(status!=0){
-          fprintf(stderr,RED"Error getting address info %s \n"RESET,gai_strerror(status));
-          exit(EXIT_FAILURE);
-     }
-
-     char ip[INET_ADDRSTRLEN];
-
-
-     struct sockaddr_in *addr=(struct sockaddr_in *)res->ai_addr;
-     inet_ntop(AF_INET, &(addr->sin_addr), ip, sizeof(ip));
-     IP *pkt=create_ip_packet(ICMP,3000,ip);
-
-     pkt->payload=packet;
-
-     u8 *raw_bytes=create_raw_ip(pkt);
  
-    
-     printf(GREEN"\nSending %hd bytes to %s \n"RESET,data_size,print_ip(inet_addr(ip)));
 
-     STATS *stats=send_packets(pkt,&keep_sending);
+   
+
      
      printf("\n");
      printf(YELLOW"---%s PINGv1 statistics---\n %lld packets transmitted, %lld received, %.1f%% packet loss,time %.1fms\n",

@@ -25,5 +25,6 @@ typedef struct {
 void send_raw_ip(IP *,STATS *,RTTsBuffer *);
 ssize_t recv_ip_packet(i32);
 STATS *send_packets(IP *pkt,volatile sig_atomic_t *);
+STATS *send_n_packets(IP *,i32);
 
 #endif
