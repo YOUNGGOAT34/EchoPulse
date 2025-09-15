@@ -45,6 +45,8 @@ void command_parser(i8 argc,i8 *argv[]){
    };
 
 
+   double_hyphen(argc,argv);
+
    return;
 
   u8 *data = (u8 *)"Hello";
@@ -138,6 +140,25 @@ void command_parser(i8 argc,i8 *argv[]){
 }
 
 
+void double_hyphen(i32 argc,i8 *argv[]){
+   
+     const char *long_opts[]={"count"};
+     for(int i=0;i<argc;i++){
+        
+         if(argv[i][0]=='-' && argv[i][1]!='-' && strlen(argv[i])>2){
+             int size=sizeof(long_opts)/sizeof(long_opts[0]);
+             for(int j=0;j<size;j++){
+                  if(strcmp(argv[i]+1,long_opts[j])==0){
+                      fprintf(stderr,RED"Invalid option %s .Did you mean --%s?\n"RESET,argv[i],long_opts[j]);
+                      
+                      exit(EXIT_FAILURE);
+                  }
+             }
+         }
+     }
+}
+
+
 
 void help(){
      
@@ -145,4 +166,5 @@ void help(){
      printf("\tOptions:\n");
      printf(" \t-c, --count <number of packets>  send a specific number of packets\n\n"RESET);
      exit(EXIT_SUCCESS);
+
   }
