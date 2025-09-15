@@ -1,4 +1,4 @@
-#include <main.h>
+#include "main.h"
 
 /*
   
@@ -14,16 +14,39 @@ void handle_sigInt(__attribute__((unused)) i32 sig){
 }
 
 
-int main(int argc,char *argv[]){
+int main(i32 argc,i8 *argv[]){
 
+    
+
+     command_parser(argc,argv);
+
+     
+     signal(SIGINT,handle_sigInt);
+
+     
+
+     return 0;
+
+}
+
+
+void command_parser(i8 argc,i8 *argv[]){
+    
      if(argc<2){
           fprintf(stderr,RED"Usage: ./main <destination ip address>\n"RESET);
           exit(EXIT_SUCCESS);
      }
-     
-     signal(SIGINT,handle_sigInt);
+      
 
-     u8 *data = (u8 *)"Hello";
+
+   static struct option long_options[]={
+     {"count",required_argument,0,'c'},
+     {0,0,0,0}
+   };
+
+
+
+  u8 *data = (u8 *)"Hello";
      u16 data_size = strlen((char *)data);
      
      icmp *packet = create_icmp_packet(echo,data, data_size);
@@ -112,11 +135,21 @@ int main(int argc,char *argv[]){
      free(raw);
 
 
-     return 0;
 
 }
 
 
-void command_parser(void){
 
-}
+// void help(){
+//      printf("Usage: ./main <interface> [options]\n");
+//      printf("Options:\n");
+//      printf("  -c, --change <MAC>     Change MAC address\n");
+//      printf("  -r, --random           Generate random MAC\n");
+//      printf("  -R, --restore          Restore original MAC\n");
+//      printf("  -p, --print [type]     Print MAC (optional type)\n");
+//      printf("  -P, --permanent        Use permanent MAC\n");
+//      printf("  -d, --down             bring an interface down\n");
+//      printf("  -u, --up               bring an interface up\n");
+//      printf("  -h, --help             Show this help message\n");
+//      exit(0);
+//   }
