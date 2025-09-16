@@ -15,7 +15,7 @@ void add_rtt(RTTsBuffer *rtts,long rtt){
 }
 
 
-STATS *send_n_packets(IP *packet,i32 count){
+STATS *send_n_packets(IP *packet,i64 count,volatile sig_atomic_t *sig){
       STATS *stats=malloc(sizeof(STATS));
       if(!stats){
           fprintf(stderr,RED"Failed to allocate memory fo stats: %s\n"RESET,strerror(errno));
@@ -35,7 +35,7 @@ STATS *send_n_packets(IP *packet,i32 count){
      rttbuffer->count=0;
 
      int i=0;
-     while(i<count){
+     while(i<count && !(*sig)){
           send_raw_ip(packet,stats,rttbuffer);
           i++;
           sleep(1);

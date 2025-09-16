@@ -21,9 +21,8 @@ int main(i32 argc,i8 *argv[]){
      command_parser(argc,argv);
 
      
-     signal(SIGINT,handle_sigInt);
+   
 
-     
 
      return 0;
 
@@ -35,6 +34,7 @@ void command_parser(i8 argc,i8 *argv[]){
           help();
           exit(EXIT_SUCCESS);
      }
+
       
    static struct option long_options[]={
      {"count",required_argument,0,'c'},
@@ -44,6 +44,40 @@ void command_parser(i8 argc,i8 *argv[]){
 
 
    double_hyphen(argc,argv);
+
+   
+   
+   i32 option;
+   i32 options_index=0;
+
+   i64 count=INT_MAX;
+
+   while((option=getopt_long(argc,argv,"c:h",long_options,&options_index))!=-1){
+        switch(option){
+            case 'h':
+               help();
+               break;
+            case 'c':
+               count=strtol(optarg,NULL,0);
+               // stats=send_n_packets(pkt,count);
+               break;
+            default:
+              fprintf(stderr,RED"Unknown option\n"RESET);
+              exit(EXIT_FAILURE);
+        }
+   }
+
+
+   if(optind>=argc){
+     fprintf(stderr,RED"\n\tExpected a destination address ,Usage: ./main [options] <destination name or ip> \n\n"RESET);
+     exit(EXIT_FAILURE);
+   }
+
+   /*
+       Will handle the ctrl+c signal ,used to exit the program when the number of packets are not specified
+   */
+   signal(SIGINT,handle_sigInt);
+
 
    u8 *data = (u8 *)"Hello";
    u16 data_size = strlen((char *)data);
@@ -59,7 +93,6 @@ void command_parser(i8 argc,i8 *argv[]){
  
   
    struct addrinfo hints,*res;
-   
    memset(&hints,0,sizeof(hints));
 
    hints.ai_family=AF_INET;
@@ -81,35 +114,23 @@ void command_parser(i8 argc,i8 *argv[]){
    pkt->payload=packet;
    u8 *raw_bytes=create_raw_ip(pkt);
 
-   STATS *stats;;
+   STATS *stats;
 
    printf(GREEN"\nSending %hd bytes to %s \n"RESET,data_size,print_ip(inet_addr(ip)));
 
-   
-   i32 option;
-   i32 options_index=0;
-
-   while((option=getopt_long(argc-1,argv,"c:h",long_options,&options_index))!=-1){
-        switch(option){
-            case 'h':
-               help();
-               break;
-            case 'c':
-               i32 count=(i32)strtol(optarg,NULL,0);
-               stats=send_n_packets(pkt,count);
-                break;
-            default:
-              fprintf(stderr,RED"Unknown option\n"RESET);
-              exit(EXIT_FAILURE);
-        }
+   if(count==INT_MAX){
+      stats=send_packets(pkt,&keep_sending);
+   }else if(count>=0){
+      stats=send_n_packets(pkt,count,&keep_sending);
    }
 
+ 
    /*
       Formatted output 
    */
 
      printf("\n");
-     printf(YELLOW"---%s PINGv1 statistics---\n %lld packets transmitted, %lld received, %.1f%% packet loss,time %.1fms\n",
+     printf(YELLOW"---%s EchoPulse statistics---\n %lld packets transmitted, %lld received, %.1f%% packet loss,time %.1fms\n",
            print_ip(inet_addr(ip)),
            stats->packets_sent,
            stats->packets_received,
