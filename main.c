@@ -38,6 +38,7 @@ void command_parser(i8 argc,i8 *argv[]){
       
    static struct option long_options[]={
      {"count",required_argument,0,'c'},
+     {"quiet",no_argument,0,'q'},
      {"help",no_argument,0,'h'},
      {0,0,0,0}
    };
@@ -50,7 +51,9 @@ void command_parser(i8 argc,i8 *argv[]){
    i32 option;
    i32 options_index=0;
 
-   i64 count=INT_MAX;
+   options *opts=malloc(sizeof(options));
+   opts->count=INT_MAX;
+   bool quiet=false;
 
    while((option=getopt_long(argc,argv,"c:h",long_options,&options_index))!=-1){
         switch(option){
@@ -58,9 +61,10 @@ void command_parser(i8 argc,i8 *argv[]){
                help();
                break;
             case 'c':
-               count=strtol(optarg,NULL,0);
-               // stats=send_n_packets(pkt,count);
+               opts->count=strtol(optarg,NULL,0);
                break;
+            case 'q':
+            break;
             default:
               fprintf(stderr,RED"Unknown option\n"RESET);
               exit(EXIT_FAILURE);
@@ -124,7 +128,7 @@ void command_parser(i8 argc,i8 *argv[]){
       stats=send_n_packets(pkt,count,&keep_sending);
    }
 
- 
+   
    /*
       Formatted output 
    */
