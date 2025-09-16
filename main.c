@@ -53,9 +53,9 @@ void command_parser(i8 argc,i8 *argv[]){
 
    options *opts=malloc(sizeof(options));
    opts->count=INT_MAX;
-   bool quiet=false;
+   opts->quiet=false;
 
-   while((option=getopt_long(argc,argv,"c:h",long_options,&options_index))!=-1){
+   while((option=getopt_long(argc,argv,"c:hq",long_options,&options_index))!=-1){
         switch(option){
             case 'h':
                help();
@@ -64,7 +64,8 @@ void command_parser(i8 argc,i8 *argv[]){
                opts->count=strtol(optarg,NULL,0);
                break;
             case 'q':
-            break;
+               opts->quiet=true;
+               break;
             default:
               fprintf(stderr,RED"Unknown option\n"RESET);
               exit(EXIT_FAILURE);
@@ -73,21 +74,18 @@ void command_parser(i8 argc,i8 *argv[]){
 
 
    if(optind>=argc){
-     fprintf(stderr,RED"\n\tExpected a destination address ,Usage: ./main [options] <destination name or ip> \n\n"RESET);
-     exit(EXIT_FAILURE);
-   }
+          fprintf(stderr,RED"\n\tExpected a destination address ,Usage: ./main [options] <destination name or ip> \n\n"RESET);
+          exit(EXIT_FAILURE);
+     }
 
    /*
        Will handle the ctrl+c signal ,used to exit the program when the number of packets are not specified
    */
    signal(SIGINT,handle_sigInt);
-
-
+    
    u8 *data = (u8 *)"Hello";
    u16 data_size = strlen((char *)data);
-   
    icmp *packet = create_icmp_packet(echo,data, data_size);
-
    u8 *raw=create_raw_icmp(packet);
  
    if(!raw){
@@ -122,10 +120,10 @@ void command_parser(i8 argc,i8 *argv[]){
 
    printf(GREEN"\nSending %hd bytes to %s \n"RESET,data_size,print_ip(inet_addr(ip)));
 
-   if(count==INT_MAX){
-      stats=send_packets(pkt,&keep_sending);
-   }else if(count>=0){
-      stats=send_n_packets(pkt,count,&keep_sending);
+   if(opts->count==INT_MAX){
+      stats=send_packets(pkt,&keep_sending,opts);
+   }else if(opts->count>=0){
+      stats=send_n_packets(pkt,opts,&keep_sending);
    }
 
    

@@ -15,7 +15,7 @@ void add_rtt(RTTsBuffer *rtts,long rtt){
 }
 
 
-STATS *send_n_packets(IP *packet,i64 count,volatile sig_atomic_t *sig){
+STATS *send_n_packets(IP *packet,options *opts,volatile sig_atomic_t *sig){
       STATS *stats=malloc(sizeof(STATS));
       if(!stats){
           fprintf(stderr,RED"Failed to allocate memory fo stats: %s\n"RESET,strerror(errno));
@@ -35,8 +35,8 @@ STATS *send_n_packets(IP *packet,i64 count,volatile sig_atomic_t *sig){
      rttbuffer->count=0;
 
      int i=0;
-     while(i<count && !(*sig)){
-          send_raw_ip(packet,stats,rttbuffer);
+     while(i<opts->count && !(*sig)){
+          send_raw_ip(packet,stats,rttbuffer,opts);
           i++;
           sleep(1);
      }
@@ -46,7 +46,7 @@ STATS *send_n_packets(IP *packet,i64 count,volatile sig_atomic_t *sig){
 
 
 
-STATS *send_packets(IP *pkt,volatile sig_atomic_t *sig){
+STATS *send_packets(IP *pkt,volatile sig_atomic_t *sig,options *opts){
      STATS *stats=malloc(sizeof(STATS));
      if(!stats){
           fprintf(stderr,RED"Failed to allocate memory fo stats: %s\n"RESET,strerror(errno));
@@ -66,7 +66,7 @@ STATS *send_packets(IP *pkt,volatile sig_atomic_t *sig){
      rttbuffer->count=0;
 
      while(!(*sig)){
-          send_raw_ip(pkt,stats,rttbuffer);
+          send_raw_ip(pkt,stats,rttbuffer,opts);
           sleep(1);
      }
 
@@ -87,7 +87,7 @@ STATS *send_packets(IP *pkt,volatile sig_atomic_t *sig){
 
 
 
-void send_raw_ip(IP *packet,STATS *stats,RTTsBuffer *rtts){
+void send_raw_ip(IP *packet,STATS *stats,RTTsBuffer *rtts,options *opts){
      struct timeval start,end;
      if(!packet){
        error("Cannot send a null packet\n");
@@ -120,6 +120,7 @@ void send_raw_ip(IP *packet,STATS *stats,RTTsBuffer *rtts){
      if(packet->payload){
          size+=packet->payload->size;
      }
+
       gettimeofday(&start,NULL);
      ssize_t bytes_sent=sendto(sockfd,raw_ip,size,0,(const struct sockaddr *)&dst,sizeof(dst));
      if(bytes_sent<0){
@@ -128,7 +129,7 @@ void send_raw_ip(IP *packet,STATS *stats,RTTsBuffer *rtts){
 
 
      
-     ssize_t received_bytes=recv_ip_packet(sockfd);
+     ssize_t received_bytes=recv_ip_packet(sockfd,opts);
      gettimeofday(&end,NULL);
      
      double rtt=((end.tv_sec-start.tv_sec)*1000.0L)+((end.tv_usec-start.tv_usec)/1000.0L);
@@ -143,8 +144,10 @@ void send_raw_ip(IP *packet,STATS *stats,RTTsBuffer *rtts){
           stats->duration_ms+=rtt;
          
           stats->packets_received++;
-          printf("time=%.1f ms "RESET,rtt);
-          printf("\n");
+          if(!opts->quiet){
+               printf("time=%.1f ms "RESET,rtt);
+               printf("\n");
+          }
      }
 
      
@@ -155,7 +158,7 @@ void send_raw_ip(IP *packet,STATS *stats,RTTsBuffer *rtts){
 }
 
 
-ssize_t recv_ip_packet(i32 sockfd){
+ssize_t recv_ip_packet(i32 sockfd,options *opts){
   
    i8 buffer[65536];
    struct sockaddr_in src_addr;
@@ -174,18 +177,20 @@ ssize_t recv_ip_packet(i32 sockfd){
       }else{
          error("Response Error\n");
       }
-     //  exit(1);
+    
    }
 
    RAWIP *res=(RAWIP *)buffer;
 
    raw_icmp *ricmp=(raw_icmp *)(buffer+(res->ihl*4));
-    printf("\n");
+  
    if(ricmp->type==0 && ricmp->code==0){
-            
-            printf(GREEN "%ld bytes ",bytes_received-(res->ihl*4));
-            printf("from %s: ",print_ip(src_addr.sin_addr.s_addr));
-            printf("icmp_seq=%hd ",ntohs(ricmp->sequence));
+            if(!opts->quiet){
+
+                 printf(GREEN "\n%ld bytes ",bytes_received-(res->ihl*4));
+                 printf("from %s: ",print_ip(src_addr.sin_addr.s_addr));
+                 printf("icmp_seq=%hd ",ntohs(ricmp->sequence));
+            }
             
    }else if(ricmp->type==3){
       switch(ricmp->code){

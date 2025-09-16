@@ -60,6 +60,11 @@ typedef struct raw_icmp{
      u8 data[];
 }__attribute__((packed)) raw_icmp;
 
+typedef struct{
+     i64 count;
+     bool quiet;
+}__attribute__((packed)) options;
+
 icmp *create_icmp_packet(TYPE type,u8 *data,u16 size);
 u8 *create_raw_icmp(icmp *packet);
 void error(const i8* msg);

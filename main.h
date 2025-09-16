@@ -5,10 +5,7 @@
 #include "send_raw.h"
 #include <getopt.h>
 
-typedef struct{
-     i64 count;
-     bool quiet;
-}options;
+
 
 int main(i32,i8 *[]);
 void command_parser(i8 ,i8 *[]);

@@ -22,9 +22,9 @@ typedef struct {
    i64 capacity;
 }RTTsBuffer;
 
-void send_raw_ip(IP *,STATS *,RTTsBuffer *);
-ssize_t recv_ip_packet(i32);
-STATS *send_packets(IP *pkt,volatile sig_atomic_t *);
-STATS *send_n_packets(IP *,i64,volatile sig_atomic_t *);
+void send_raw_ip(IP *,STATS *,RTTsBuffer *,options *);
+ssize_t recv_ip_packet(i32,options *);
+STATS *send_packets(IP *pkt,volatile sig_atomic_t *,options *opts);
+STATS *send_n_packets(IP *,options *,volatile sig_atomic_t *);
 
 #endif
