@@ -38,6 +38,7 @@ void command_parser(i8 argc,i8 *argv[]){
       
    static struct option long_options[]={
      {"count",required_argument,0,'c'},
+     {"size",required_argument,0,'s'},
      {"quiet",no_argument,0,'q'},
      {"help",no_argument,0,'h'},
      {0,0,0,0}
@@ -57,7 +58,7 @@ void command_parser(i8 argc,i8 *argv[]){
    opts->payload_size=56;
 
 
-   while((option=getopt_long(argc,argv,"c:hq",long_options,&options_index))!=-1){
+   while((option=getopt_long(argc,argv,"c:hqs:",long_options,&options_index))!=-1){
         switch(option){
             case 'h':
                help();
@@ -67,6 +68,9 @@ void command_parser(i8 argc,i8 *argv[]){
                break;
             case 'q':
                opts->quiet=true;
+               break;
+            case 's':
+               opts->payload_size=(u16)strtol(optarg,NULL,0);
                break;
             default:
               fprintf(stderr,RED"Unknown option\n"RESET);
@@ -205,9 +209,12 @@ void double_hyphen(i32 argc,i8 *argv[]){
 
 void help(){
      
-     printf(WHITE"\n\tUsage: ./main [options] <destination name or ip> \n");
-     printf("\tOptions:\n");
-     printf(" \t-c, --count <number of packets>  send a specific number of packets\n\n"RESET);
+     printf(WHITE"\n\tUsage: ./main [options] <destination name or ip> \n\n");
+     printf("\tOptions:\n\n");
+     printf(" \t-c, --count <number of packets>  send a specific number of packets\n\n");
+     printf(" \t-q, --quiet   Quiet output ,only summary(statistics)\n\n");
+     printf(" \t-s, --size <size>  specify the packet size\n\n"RESET);
+
      exit(EXIT_SUCCESS);
 
   }
