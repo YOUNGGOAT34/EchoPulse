@@ -54,6 +54,8 @@ void command_parser(i8 argc,i8 *argv[]){
    options *opts=malloc(sizeof(options));
    opts->count=INT_MAX;
    opts->quiet=false;
+   opts->payload_size=56;
+
 
    while((option=getopt_long(argc,argv,"c:hq",long_options,&options_index))!=-1){
         switch(option){
@@ -83,9 +85,9 @@ void command_parser(i8 argc,i8 *argv[]){
    */
    signal(SIGINT,handle_sigInt);
     
-   u8 *data = (u8 *)"Hello";
-   u16 data_size = strlen((char *)data);
-   icmp *packet = create_icmp_packet(echo,data, data_size);
+   u8 *data =malloc(opts->payload_size);
+   memset(data,'G',opts->payload_size);
+   icmp *packet = create_icmp_packet(echo,data, opts->payload_size);
    u8 *raw=create_raw_icmp(packet);
  
    if(!raw){
@@ -118,7 +120,7 @@ void command_parser(i8 argc,i8 *argv[]){
 
    STATS *stats;
 
-   printf(GREEN"\nSending %hd bytes to %s \n"RESET,data_size,print_ip(inet_addr(ip)));
+   printf(GREEN"\nSending %hd bytes to %s \n"RESET,opts->payload_size,print_ip(inet_addr(ip)));
 
    if(opts->count==INT_MAX){
       stats=send_packets(pkt,&keep_sending,opts);
@@ -169,12 +171,14 @@ void command_parser(i8 argc,i8 *argv[]){
 
 
      //memory freeing
+     free(data);
      free(stats);
      freeaddrinfo(res);
      free(pkt);
      free(raw_bytes);
      free(packet);
      free(raw);
+
 
 }
 
