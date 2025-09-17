@@ -98,8 +98,8 @@ void send_raw_ip(IP *packet,STATS *stats,RTTsBuffer *rtts,options *opts){
      }
 
      struct timeval tv;
-     tv.tv_sec = 1;
-     tv.tv_usec = 0;
+     tv.tv_sec = opts->timeout/1000;
+     tv.tv_usec =(opts->timeout%1000)*1000;
      setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
      
      i32 one=1;
