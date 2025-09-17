@@ -44,6 +44,7 @@ void command_parser(i8 argc,i8 *argv[]){
      {"ttl",required_argument,0,'t'},
      {"timeout",required_argument,0,'W'},
      {"time",required_argument,0,'w'},
+     {"interval",required_argument,0,'i'},
      {"help",no_argument,0,'h'},
      {0,0,0,0}
    };
@@ -51,7 +52,6 @@ void command_parser(i8 argc,i8 *argv[]){
 
    double_hyphen(argc,argv);
 
-   
    i32 option;
    i32 options_index=0;
 
@@ -62,8 +62,9 @@ void command_parser(i8 argc,i8 *argv[]){
    opts->ttl=255;
    opts->timeout=1000;
    opts->time=0;
+   opts->interval=0;
 
-   while((option=getopt_long(argc,argv,"c:hqs:t:W:w:",long_options,&options_index))!=-1){
+   while((option=getopt_long(argc,argv,"c:hqs:t:W:w:i:",long_options,&options_index))!=-1){
         switch(option){
             case 'h':
                help();
@@ -81,13 +82,15 @@ void command_parser(i8 argc,i8 *argv[]){
                opts->ttl=parse_ttl((const i8 *) optarg);
                break;
             case 'W':
-               u64 time=strtol(optarg,NULL,0);
-               opts->timeout=time;
+               opts->timeout=strtol(optarg,NULL,0);
                break;
             case 'w':
-          //   u64 total_time=strtol(optarg,NULL,0);
-            opts->time=strtol(optarg,NULL,0);
-            break;
+         
+               opts->time=strtol(optarg,NULL,0);
+               break;
+            case 'i':
+               opts->interval=strtol(optarg,NULL,0);
+               break;
             default:
               fprintf(stderr,RED"Unknown option\n"RESET);
 
@@ -231,8 +234,9 @@ void help(){
      printf(" \t-q, --quiet   Quiet output ,only summary(statistics)\n\n");
      printf(" \t-s, --size <size>  specify the packet size\n\n");
      printf(" \t-t, --ttl <time>  specify the packet size\n\n");
+     printf(" \t-i, --interval <time>  interval between packets in seconds\n\n");
      printf(" \t-W, --timeout <time>  wait time per packet size\n\n"RESET);
-
+     
 
      exit(EXIT_SUCCESS);
    

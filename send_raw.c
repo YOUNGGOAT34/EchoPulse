@@ -66,7 +66,7 @@ STATS *send_packets(IP *pkt,volatile sig_atomic_t *sig,options *opts){
      rttbuffer->count=0;
      
      struct timeval start,now;
-
+     u64 sleep_time=(opts->interval>0)?opts->interval:1;
      gettimeofday(&start,NULL);
 
      while(!(*sig)){
@@ -83,7 +83,7 @@ STATS *send_packets(IP *pkt,volatile sig_atomic_t *sig,options *opts){
                }
           }
           send_raw_ip(pkt,stats,rttbuffer,opts);
-          sleep(1);
+          sleep(sleep_time);
      }
 
      
