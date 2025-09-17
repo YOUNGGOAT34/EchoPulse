@@ -115,8 +115,7 @@ void command_parser(i8 argc,i8 *argv[]){
    u8 *raw=create_raw_icmp(packet);
  
    if(!raw){
-        printf("Empty\n");
-        exit(1);
+       error("Failed to allocate memory for a raw icmp packet");
    }
  
   
