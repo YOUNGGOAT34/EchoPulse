@@ -75,7 +75,7 @@ IP *create_ip_packet(const u8 type,u16 id,const i8 *dst){
   
 }
 
-u8 *create_raw_ip(IP *packet){
+u8 *create_raw_ip(IP *packet,options *opts){
       if(!packet) return NULL;
       u8 protocol=0;
       switch(packet->type){
@@ -104,7 +104,8 @@ u8 *create_raw_ip(IP *packet){
       rawpkt.length=htons(ttlength);
       rawpkt.src=packet->src;
       rawpkt.dst=packet->dst;
-      rawpkt.TTL=250;
+
+      rawpkt.TTL=opts->ttl;
       rawpkt.version=4;
 
       rawpkt.checksum=0;

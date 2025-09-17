@@ -64,6 +64,7 @@ typedef struct{
      i64 count;
      bool quiet;
      i16 payload_size;
+     i8 ttl;
 }__attribute__((packed)) options;
 
 icmp *create_icmp_packet(TYPE type,u8 *data,u16 size);

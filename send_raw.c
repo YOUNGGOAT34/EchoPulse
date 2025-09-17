@@ -107,7 +107,7 @@ void send_raw_ip(IP *packet,STATS *stats,RTTsBuffer *rtts,options *opts){
         error("Failed to set socket options\n");
      }
 
-     u8 *raw_ip=create_raw_ip(packet);
+     u8 *raw_ip=create_raw_ip(packet,opts);
      if(!raw_ip){
         error("Failed to create raw ip bytes\n");
      }

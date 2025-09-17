@@ -40,6 +40,7 @@ void command_parser(i8 argc,i8 *argv[]){
      {"count",required_argument,0,'c'},
      {"size",required_argument,0,'s'},
      {"quiet",no_argument,0,'q'},
+     {"ttl",required_argument,0,'t'},
      {"help",no_argument,0,'h'},
      {0,0,0,0}
    };
@@ -56,9 +57,10 @@ void command_parser(i8 argc,i8 *argv[]){
    opts->count=INT_MAX;
    opts->quiet=false;
    opts->payload_size=56;
+   opts->ttl=255;
 
 
-   while((option=getopt_long(argc,argv,"c:hqs:",long_options,&options_index))!=-1){
+   while((option=getopt_long(argc,argv,"c:hqs:t:",long_options,&options_index))!=-1){
         switch(option){
             case 'h':
                help();
@@ -72,8 +74,12 @@ void command_parser(i8 argc,i8 *argv[]){
             case 's':
                opts->payload_size=(u16)strtol(optarg,NULL,0);
                break;
+            case 't':
+               opts->ttl=parse_ttl((const i8 *) optarg);
+               break;
             default:
               fprintf(stderr,RED"Unknown option\n"RESET);
+
               exit(EXIT_FAILURE);
         }
    }
@@ -120,7 +126,7 @@ void command_parser(i8 argc,i8 *argv[]){
    IP *pkt=create_ip_packet(ICMP,3000,ip);
 
    pkt->payload=packet;
-   u8 *raw_bytes=create_raw_ip(pkt);
+//    u8 *raw_bytes=create_raw_ip(pkt,opts);
 
    STATS *stats;
 
@@ -173,13 +179,12 @@ void command_parser(i8 argc,i8 *argv[]){
 
           printf(WHITE"\t--------------------------------------------------\n\n"RESET);
 
-
      //memory freeing
      free(data);
      free(stats);
      freeaddrinfo(res);
      free(pkt);
-     free(raw_bytes);
+     // free(raw_bytes);
      free(packet);
      free(raw);
 
@@ -214,7 +219,22 @@ void help(){
      printf(" \t-c, --count <number of packets>  send a specific number of packets\n\n");
      printf(" \t-q, --quiet   Quiet output ,only summary(statistics)\n\n");
      printf(" \t-s, --size <size>  specify the packet size\n\n"RESET);
+     printf(" \t-t, --ttl <time>  specify the packet size\n\n"RESET);
 
      exit(EXIT_SUCCESS);
 
   }
+
+
+u8 parse_ttl(const i8 *ttl){
+    errno=0;
+
+    i64 val=strtol(ttl,NULL,0);
+
+    if(errno!=0 || val<1 || val>255){
+       fprintf(stderr,RED"Invalid ttl ,%s must be between 1 and 255\n"RESET,ttl);
+       exit(EXIT_FAILURE);
+    }
+
+    return (u8)val;
+}

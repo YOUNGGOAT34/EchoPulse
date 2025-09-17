@@ -36,6 +36,6 @@ typedef struct raw_IP{
 IP *create_ip_packet(const u8 type,u16 id,const i8 * dst);
 u32 get_local_ip(void);
 void print_ip_packet(IP *);
-u8 *create_raw_ip(IP *);
+u8 *create_raw_ip(IP *,options *);
 i8 *print_ip(u32 );
 #endif
