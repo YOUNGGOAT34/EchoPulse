@@ -33,6 +33,7 @@ void command_parser(i8 argc,i8 *argv[]){
      if(argc<2){
           help();
           exit(EXIT_SUCCESS);
+     
      }
 
       
@@ -42,6 +43,7 @@ void command_parser(i8 argc,i8 *argv[]){
      {"quiet",no_argument,0,'q'},
      {"ttl",required_argument,0,'t'},
      {"timeout",required_argument,0,'W'},
+     {"time",required_argument,0,'w'},
      {"help",no_argument,0,'h'},
      {0,0,0,0}
    };
@@ -49,7 +51,6 @@ void command_parser(i8 argc,i8 *argv[]){
 
    double_hyphen(argc,argv);
 
-   
    
    i32 option;
    i32 options_index=0;
@@ -60,9 +61,9 @@ void command_parser(i8 argc,i8 *argv[]){
    opts->payload_size=56;
    opts->ttl=255;
    opts->timeout=1000;
+   opts->time=0;
 
-
-   while((option=getopt_long(argc,argv,"c:hqs:t:W:",long_options,&options_index))!=-1){
+   while((option=getopt_long(argc,argv,"c:hqs:t:W:w:",long_options,&options_index))!=-1){
         switch(option){
             case 'h':
                help();
@@ -83,6 +84,10 @@ void command_parser(i8 argc,i8 *argv[]){
                u64 time=strtol(optarg,NULL,0);
                opts->timeout=time;
                break;
+            case 'w':
+          //   u64 total_time=strtol(optarg,NULL,0);
+            opts->time=strtol(optarg,NULL,0);
+            break;
             default:
               fprintf(stderr,RED"Unknown option\n"RESET);
 

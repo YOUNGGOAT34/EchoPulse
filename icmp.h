@@ -66,6 +66,7 @@ typedef struct{
      i16 payload_size;
      i8 ttl;
      u64 timeout;
+     u64 time;
 }__attribute__((packed)) options;
 
 icmp *create_icmp_packet(TYPE type,u8 *data,u16 size);

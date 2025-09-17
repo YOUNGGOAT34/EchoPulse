@@ -64,8 +64,24 @@ STATS *send_packets(IP *pkt,volatile sig_atomic_t *sig,options *opts){
      RTTsBuffer *rttbuffer=malloc(sizeof(RTTsBuffer));
      rttbuffer->capacity=0;
      rttbuffer->count=0;
+     
+     struct timeval start,now;
+
+     gettimeofday(&start,NULL);
 
      while(!(*sig)){
+          /*
+             So if the user passed a -w or --time option ,the program should exit when it times out
+          */
+          if(opts->time>0){
+               gettimeofday(&now,NULL);
+
+               double time_taken=(now.tv_sec-start.tv_sec)+(now.tv_usec-start.tv_usec)/1000000;
+
+               if(time_taken>=opts->time){
+                    break;
+               }
+          }
           send_raw_ip(pkt,stats,rttbuffer,opts);
           sleep(1);
      }
