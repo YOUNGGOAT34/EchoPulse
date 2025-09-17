@@ -235,8 +235,9 @@ void help(){
      printf(" \t-s, --size <size>  specify the packet size\n\n");
      printf(" \t-t, --ttl <time>  specify the packet size\n\n");
      printf(" \t-i, --interval <time>  interval between packets in seconds\n\n");
+     printf(" \t-w, --time <time>  session will automatically terminate after this duration,in miliseconds\n\n");
      printf(" \t-W, --timeout <time>  wait time per packet size\n\n"RESET);
-     
+     //add help for the total time the session will take
 
      exit(EXIT_SUCCESS);
    
