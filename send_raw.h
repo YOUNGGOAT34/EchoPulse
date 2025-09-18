@@ -23,7 +23,7 @@ typedef struct {
 }RTTsBuffer;
 
 void send_raw_ip(IP *,STATS *,RTTsBuffer *,options *);
-ssize_t recv_ip_packet(i32,options *);
+ssize_t recv_ip_packet(i32,options *,u32 );
 STATS *send_packets(IP *pkt,volatile sig_atomic_t *,options *opts);
 STATS *send_n_packets(IP *,options *,volatile sig_atomic_t *);
 

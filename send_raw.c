@@ -145,7 +145,7 @@ void send_raw_ip(IP *packet,STATS *stats,RTTsBuffer *rtts,options *opts){
 
 
      
-     ssize_t received_bytes=recv_ip_packet(sockfd,opts);
+     ssize_t received_bytes=recv_ip_packet(sockfd,opts,packet->dst);
      gettimeofday(&end,NULL);
      
      double rtt=((end.tv_sec-start.tv_sec)*1000.0L)+((end.tv_usec-start.tv_usec)/1000.0L);
@@ -174,7 +174,7 @@ void send_raw_ip(IP *packet,STATS *stats,RTTsBuffer *rtts,options *opts){
 }
 
 
-ssize_t recv_ip_packet(i32 sockfd,options *opts){
+ssize_t recv_ip_packet(i32 sockfd,options *opts,u32 dst_ip){
   
    i8 buffer[65536];
    struct sockaddr_in src_addr;
@@ -199,17 +199,19 @@ ssize_t recv_ip_packet(i32 sockfd,options *opts){
    RAWIP *res=(RAWIP *)buffer;
 
    raw_icmp *ricmp=(raw_icmp *)(buffer+(res->ihl*4));
-  
-   if(ricmp->type==0 && ricmp->code==0){
+
+   i8 *src_ip=print_ip(src_addr.sin_addr.s_addr);
+   i8 *dst__ip=print_ip(dst_ip);
+
+   if(ricmp->type==0 && ricmp->code==0 && strcmp(dst__ip,src_ip)==0){
             if(!opts->quiet){
 
-                 char *dst_ip=print_ip(src_addr.sin_addr.s_addr);
 
                  printf(GREEN "\n%ld bytes ",bytes_received-(res->ihl*4));
-                 printf("from %s: ",dst_ip);
+                 printf("from %s: ",src_ip);
                  printf("icmp_seq=%hd ",ntohs(ricmp->sequence));
 
-                 free(dst_ip);
+                 free(src_ip);
             }
             
    }else if(ricmp->type==3){
@@ -267,6 +269,10 @@ ssize_t recv_ip_packet(i32 sockfd,options *opts){
             
       }
       
+   }else{
+      free(dst__ip);
+      free(src_ip);
+      return -1;
    }
 
   return bytes_received;
