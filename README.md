@@ -45,7 +45,7 @@ sudo ./echopulse [options] <destination>
 
 **Example**
 
-Ping google.com 5 times with 64-byte payloads, 2-second timeout, and 1-second interval:
+Ping google.com 5 times with 64-byte payloads, 2-second timeout, and 1-second interval:  
 sudo ./echopulse -c 5 -s 64 -t 2 -i 1 google.com
 
 
