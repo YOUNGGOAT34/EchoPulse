@@ -22,7 +22,7 @@
 Ensure you have a GCC-compatible compiler.
 
 ```bash
-make
+make all
 
 ```
 This will compile the **echopulse** executable.
