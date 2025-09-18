@@ -2,6 +2,7 @@
 #define SEND_RAW_H
 
 #include "ip.h"
+#include <math.h>
 
 typedef struct{
     i64 packets_sent;

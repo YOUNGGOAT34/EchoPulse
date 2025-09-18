@@ -1,6 +1,7 @@
 CC :=gcc
 
 FLAGS := -Wall -Wextra
+LDFLAGS := -lm
 SRC := $(wildcard *.c)
 OBJECTS := $(SRC:.c=.o)
 BUILD_DIR:=build
@@ -9,7 +10,7 @@ TARGET :=main
 
 all:clean $(TARGET) 
 $(TARGET):$(OBJECTS)
-			$(CC) -o $@ $^
+			$(CC) -o $@ $^ $(LDFLAGS)
 $(BUILD_DIR)/%.o:%.c
 						mkdir -p $(BUILD_DIR)
 						$(CC) $(FLAGS) -c $< -o $@

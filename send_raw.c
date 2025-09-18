@@ -31,6 +31,7 @@ STATS *send_n_packets(IP *packet,options *opts,volatile sig_atomic_t *sig){
      stats->mdev_rtt=0;
 
      RTTsBuffer *rttbuffer=malloc(sizeof(RTTsBuffer));
+     // if(!rttbuffer)
      rttbuffer->capacity=0;
      rttbuffer->count=0;
 
@@ -56,7 +57,7 @@ STATS *send_n_packets(IP *packet,options *opts,volatile sig_atomic_t *sig){
 STATS *send_packets(IP *pkt,volatile sig_atomic_t *sig,options *opts){
      STATS *stats=malloc(sizeof(STATS));
      if(!stats){
-          fprintf(stderr,RED"Failed to allocate memory fo stats: %s\n"RESET,strerror(errno));
+          fprintf(stderr,RED"Failed to allocate memory for stats: %s\n"RESET,strerror(errno));
           return NULL;
      }
 
@@ -99,13 +100,14 @@ STATS *send_packets(IP *pkt,volatile sig_atomic_t *sig,options *opts){
      
      stats->avg_rtt=(stats->packets_received > 0)?stats->total_rtt/stats->packets_received:0;
 
-     double sum_dev=0;
+     double sum_sq_dev=0;
      for(i64 i=0;i<rttbuffer->count;i++){
-          i64 diff=rttbuffer->rtts[i]-stats->avg_rtt;
-          sum_dev+=(diff>0)?diff:-diff;
+          double diff=(double)rttbuffer->rtts[i]-(double)stats->avg_rtt;
+          sum_sq_dev+=diff*diff;
      }
-
-     stats->mdev_rtt=(stats->packets_received>0)? sum_dev/stats->packets_received :0;
+    
+     // stats->mdev_rtt=(stats->packets_received>0)? sum_sq_dev/stats->packets_received :0;
+     stats->mdev_rtt=(rttbuffer->count>1)?sqrt(sum_sq_dev/rttbuffer->count):0;
      free(rttbuffer->rtts);
      free(rttbuffer);
      return stats;
@@ -220,7 +222,8 @@ ssize_t recv_ip_packet(i32 sockfd,options *opts,u32 dst_ip){
                  printf(GREEN "\n%ld bytes ",bytes_received-(res->ihl*4));
                  printf("from %s: ",src_ip);
                  printf("icmp_seq=%hd ",ntohs(ricmp->sequence));
-
+                 
+                 free(dst__ip);
                  free(src_ip);
             }
             
