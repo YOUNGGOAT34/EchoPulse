@@ -87,7 +87,7 @@ STATS *send_packets(IP *pkt,volatile sig_atomic_t *sig,options *opts){
      }
 
      
-     stats->avg_rtt=stats->total_rtt/stats->packets_received;
+     stats->avg_rtt=(stats->packets_received > 0)?stats->total_rtt/stats->packets_received:0;
 
      double sum_dev=0;
      for(i64 i=0;i<rttbuffer->count;i++){
