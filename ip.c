@@ -163,15 +163,22 @@ void print_ip_packet(IP *packet){
      if(!packet){
          error("Null IP packet\n");
      }
+
+     i8 *ip_dst=print_ip(packet->dst);
+     i8 *ip_src=print_ip(packet->src);
+
      printf("Type: %02hhx\n",packet->type);
      printf("id: %02hx\n",packet->id);
-     printf("src: ");
-     print_ip(packet->src);
-     printf("dst: ");
-     print_ip(packet->dst);
+     printf("src: %s",ip_src);
+    //  print_ip(packet->src);
+     printf("dst: %s",ip_dst);
+    //  print_ip(packet->dst);
 
      if(packet->payload){
         print_icmp_packet(packet->payload,packet->payload->size);
      }
+
+     free(ip_dst);
+     free(ip_src);
 
 }
