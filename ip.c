@@ -170,10 +170,8 @@ void print_ip_packet(IP *packet){
      printf("Type: %02hhx\n",packet->type);
      printf("id: %02hx\n",packet->id);
      printf("src: %s",ip_src);
-    //  print_ip(packet->src);
      printf("dst: %s",ip_dst);
-    //  print_ip(packet->dst);
-
+      
      if(packet->payload){
         print_icmp_packet(packet->payload,packet->payload->size);
      }

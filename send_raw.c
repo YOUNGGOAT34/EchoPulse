@@ -203,9 +203,13 @@ ssize_t recv_ip_packet(i32 sockfd,options *opts){
    if(ricmp->type==0 && ricmp->code==0){
             if(!opts->quiet){
 
+                 char *dst_ip=print_ip(src_addr.sin_addr.s_addr);
+
                  printf(GREEN "\n%ld bytes ",bytes_received-(res->ihl*4));
-                 printf("from %s: ",print_ip(src_addr.sin_addr.s_addr));
+                 printf("from %s: ",dst_ip);
                  printf("icmp_seq=%hd ",ntohs(ricmp->sequence));
+
+                 free(dst_ip);
             }
             
    }else if(ricmp->type==3){
