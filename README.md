@@ -29,12 +29,11 @@ This will compile the **echopulse** executable.
 
 **Usage**
 
-Run EchoPulse with root privileges to enable raw socket operations:
+Run EchoPulse with root privileges to enable raw socket operations:  
 sudo ./echopulse [options] <destination>
 
 
 **Common options**:
-Option	      Description  
 -c <count>	      Number of echo requests to send (default: unlimited)  
 -s <size>	      Payload size in bytes (default: 56)  
 -t <timeout>	   Timeout in seconds to wait for each reply (default: 1) 
