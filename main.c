@@ -143,7 +143,9 @@ void command_parser(i8 argc,i8 *argv[]){
 
    STATS *stats;
 
-   printf(GREEN"\nSending %hd bytes to %s \n"RESET,opts->payload_size,print_ip(inet_addr(ip)));
+   i8 *ip_dst=print_ip(inet_addr(ip));
+  
+   printf(GREEN"\nSending %hd bytes to %s \n"RESET,opts->payload_size,ip_dst);
 
    if(opts->count==INT_MAX){
       stats=send_packets(pkt,&keep_sending,opts);
@@ -158,12 +160,13 @@ void command_parser(i8 argc,i8 *argv[]){
 
      printf("\n");
      printf(YELLOW"---%s EchoPulse statistics---\n %lld packets transmitted, %lld received, %.1f%% packet loss,time %.1fms\n",
-           print_ip(inet_addr(ip)),
+           ip_dst,
            stats->packets_sent,
            stats->packets_received,
            100.0*(stats->packets_sent-stats->packets_received)/stats->packets_sent,
            stats->duration_ms
      );
+
 
      printf("rtt min/avg/max/mdev=%.3f/%.3f/%.3f/%.3f ms\n"RESET,stats->min_rtt,stats->avg_rtt,stats->max_rtt,stats->mdev_rtt);
      printf("\n");
@@ -197,7 +200,7 @@ void command_parser(i8 argc,i8 *argv[]){
      free(stats);
      freeaddrinfo(res);
      free(pkt);
-     // free(raw_bytes);
+     free(ip_dst);
      free(packet);
      free(raw);
 
