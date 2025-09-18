@@ -31,7 +31,10 @@ STATS *send_n_packets(IP *packet,options *opts,volatile sig_atomic_t *sig){
      stats->mdev_rtt=0;
 
      RTTsBuffer *rttbuffer=malloc(sizeof(RTTsBuffer));
-     // if(!rttbuffer)
+     if(!rttbuffer){
+          fprintf(stderr,"Failed to allocate memory for rttbuffer: %s\n",strerror(errno));
+          return NULL;
+     }
      rttbuffer->capacity=0;
      rttbuffer->count=0;
 
@@ -46,8 +49,6 @@ STATS *send_n_packets(IP *packet,options *opts,volatile sig_atomic_t *sig){
 
      gettimeofday(&end,NULL);
      stats->duration_ms = (end.tv_sec - start.tv_sec) * 1000.0 + (end.tv_usec - start.tv_usec) / 1000.0;
-
-
 
       return stats;
 }
@@ -70,6 +71,10 @@ STATS *send_packets(IP *pkt,volatile sig_atomic_t *sig,options *opts){
      stats->mdev_rtt=0;
       
      RTTsBuffer *rttbuffer=malloc(sizeof(RTTsBuffer));
+     if(!rttbuffer){
+          fprintf(stderr,"Failed to allocate memory for rttbuffer: %s\n",strerror(errno));
+          return NULL;
+     }
      rttbuffer->capacity=0;
      rttbuffer->count=0;
      
@@ -178,9 +183,7 @@ void send_raw_ip(IP *packet,STATS *stats,RTTsBuffer *rtts,options *opts){
           }
      }
 
-     
      free(raw_ip);
-
      close(sockfd);
   
 }
@@ -211,7 +214,6 @@ ssize_t recv_ip_packet(i32 sockfd,options *opts,u32 dst_ip){
    RAWIP *res=(RAWIP *)buffer;
 
    raw_icmp *ricmp=(raw_icmp *)(buffer+(res->ihl*4));
-
    i8 *src_ip=print_ip(src_addr.sin_addr.s_addr);
    i8 *dst__ip=print_ip(dst_ip);
 
