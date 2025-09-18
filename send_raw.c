@@ -35,11 +35,18 @@ STATS *send_n_packets(IP *packet,options *opts,volatile sig_atomic_t *sig){
      rttbuffer->count=0;
 
      int i=0;
+     struct timeval start,end;
+     gettimeofday(&start,NULL);
      while(i<opts->count && !(*sig)){
           send_raw_ip(packet,stats,rttbuffer,opts);
           i++;
           sleep(1);
      }
+
+     gettimeofday(&end,NULL);
+     stats->duration_ms = (end.tv_sec - start.tv_sec) * 1000.0 + (end.tv_usec - start.tv_usec) / 1000.0;
+
+
 
       return stats;
 }
@@ -65,7 +72,7 @@ STATS *send_packets(IP *pkt,volatile sig_atomic_t *sig,options *opts){
      rttbuffer->capacity=0;
      rttbuffer->count=0;
      
-     struct timeval start,now;
+     struct timeval start,now,end;
      u64 sleep_time=(opts->interval>0)?opts->interval:1;
      gettimeofday(&start,NULL);
 
@@ -86,6 +93,9 @@ STATS *send_packets(IP *pkt,volatile sig_atomic_t *sig,options *opts){
           sleep(sleep_time);
      }
 
+     gettimeofday(&end,NULL);
+
+     stats->duration_ms = (end.tv_sec - start.tv_sec) * 1000.0 + (end.tv_usec - start.tv_usec) / 1000.0;
      
      stats->avg_rtt=(stats->packets_received > 0)?stats->total_rtt/stats->packets_received:0;
 
@@ -157,7 +167,7 @@ void send_raw_ip(IP *packet,STATS *stats,RTTsBuffer *rtts,options *opts){
           
           stats->total_rtt+=rtt;
           
-          stats->duration_ms+=rtt;
+          // stats->duration_ms+=rtt;
          
           stats->packets_received++;
           if(!opts->quiet){
