@@ -40,7 +40,9 @@ sudo ./echopulse [options] \<destination\>
 -i <interval>	   Interval in seconds between packets (default: 1)  
 -T <TTL>	      Time-to-live value for outgoing packets (default: 64)  
 -q	      Quiet mode, only print summary statistics  
+
 **without quiet option:**  
+
 ![EchoPulse Sample Output](screenshots/without_quiet.png)  
 
 **with quiet option:**  
