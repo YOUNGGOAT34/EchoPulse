@@ -30,7 +30,7 @@ This will compile the **echopulse** executable.
 **Usage**
 
 Run EchoPulse with root privileges to enable raw socket operations:  
-sudo ./echopulse [options] <destination>
+sudo ./echopulse [options] \<destination\>
 
 
 **Common options**:  
