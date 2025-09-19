@@ -60,7 +60,7 @@ Here’s a sample output of EchoPulse in action:
 
 **Connection Quality Interpretation**
 
-EchoPulse interprets connection quality based on RTT and packet loss:
+EchoPulse interprets connection quality based on RTT and packet loss:  
 *Quality	Description*  
 Excellent	RTT < 50ms and packet loss < 1%  
 Good	RTT < 100ms and packet loss < 3%  
