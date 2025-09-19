@@ -55,18 +55,19 @@ sudo ./echopulse -c 5 -s 64 -t 2 -i 1 google.com
 
 Here’s a sample output of EchoPulse in action:
 
-![EchoPulse Sample Output](screenshots/statistics.png)
+![EchoPulse Sample Output](screenshots/running.png)
 
 
 **Connection Quality Interpretation**
 
 EchoPulse interprets connection quality based on RTT and packet loss:
-*Quality	Description*
-Excellent	RTT < 50ms and packet loss < 1%
-Good	RTT < 100ms and packet loss < 3%
-Moderate	RTT < 200ms or packet loss < 5%
-Poor	RTT ≥ 200ms or packet loss ≥ 5%
+*Quality	Description*  
+Excellent	RTT < 50ms and packet loss < 1%  
+Good	RTT < 100ms and packet loss < 3%  
+Moderate	RTT < 200ms or packet loss < 5%  
+Poor	RTT ≥ 200ms or packet loss ≥ 5%  
 
+![EchoPulse Sample Output](screenshots/stats.png)
 
 *Contributions*
 
