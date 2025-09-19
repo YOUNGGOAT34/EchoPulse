@@ -42,8 +42,11 @@ sudo ./echopulse [options] \<destination\>
 -q	      Quiet mode, only print summary statistics  
 **without quiet option:**  
 ![EchoPulse Sample Output](screenshots/without_quiet.png)  
+
 **with quiet option:**  
+
 ![EchoPulse Sample Output](screenshots/with_quiet.png)  
+
 -h	      Display help and usage information  
 
 ![EchoPulse Sample Output](screenshots/help.png)  
