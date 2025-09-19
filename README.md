@@ -45,8 +45,17 @@ sudo ./echopulse [options] <destination>
 
 **Example**
 
-Ping google.com 5 times with 64-byte payloads, 2-second timeout, and 1-second interval:  
+Ping google.com 5 times with 64-byte payloads, 2-second timeout, and 1-second interval:
+```bash  
 sudo ./echopulse -c 5 -s 64 -t 2 -i 1 google.com
+
+```
+
+### Screenshot Example
+
+Here’s a sample output of EchoPulse in action:
+
+![EchoPulse Sample Output](screenshots/echopulse_output.png)
 
 
 **Connection Quality Interpretation**
