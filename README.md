@@ -55,7 +55,7 @@ sudo ./echopulse -c 5 -s 64 -t 2 -i 1 google.com
 
 Here’s a sample output of EchoPulse in action:
 
-![EchoPulse Sample Output](screenshots/echopulse_output.png)
+![EchoPulse Sample Output](screenshots/statistics.png)
 
 
 **Connection Quality Interpretation**
