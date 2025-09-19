@@ -6,7 +6,7 @@ SRC := $(wildcard *.c)
 OBJECTS := $(SRC:.c=.o)
 BUILD_DIR:=build
 OBJECTS:=$(addprefix $(BUILD_DIR)/,$(OBJECTS))
-TARGET :=main
+TARGET :=echopulse
 
 all:clean $(TARGET) 
 $(TARGET):$(OBJECTS)
