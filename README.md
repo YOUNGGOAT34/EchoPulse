@@ -69,6 +69,17 @@ Poor	RTT ≥ 200ms or packet loss ≥ 5%
 
 ![EchoPulse Sample Output](screenshots/stats.png)
 
+
+## Future Plans
+
+EchoPulse is actively being improved. Here are some features planned for future releases:
+
+- [ ] **Multi-host support**: Send ICMP Echo Requests to multiple hosts in parallel or sequentially and report results.
+- [ ] **Subnet sweep**: Automatically detect and ping all live hosts in a given subnet (e.g., `192.168.1.0/24`), useful for network discovery.
+
+
+
+
 *Contributions*
 
 Contributions, issues, and feature requests are welcome! Feel free to fork the repo and submit pull requests.
