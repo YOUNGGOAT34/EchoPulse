@@ -42,6 +42,8 @@ sudo ./echopulse [options] \<destination\>
 -q	      Quiet mode, only print summary statistics  
 -h	      Display help and usage information  
 
+![EchoPulse Sample Output](screenshots/help.png)  
+
 
 **Example**
 
