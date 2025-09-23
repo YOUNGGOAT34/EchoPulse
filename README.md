@@ -38,7 +38,9 @@ sudo ./echopulse [options] \<destination\>
 -s <size>	      Payload size in bytes (default: 56)  
 -t <timeout>	   Timeout in seconds to wait for each reply (default: 1) 
 -i <interval>	   Interval in seconds between packets (default: 1)  
--T <TTL>	      Time-to-live value for outgoing packets (default: 64)  
+-t <time in seconds>	      Time-to-live value for outgoing packets (default: 64)  
+ ![EchoPulse Sample Output](screenshots/ttl.png)  
+
 -q	      Quiet mode, only print summary statistics  
 
 **without quiet option:**  
