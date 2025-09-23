@@ -36,6 +36,7 @@ sudo ./echopulse [options] \<destination\>
 **options**:  
 -c \<count\>	      Number of echo requests to send (default: unlimited)  
 -s \<size\>	      Payload size in bytes (default: 56)  
+ ![EchoPulse Sample Output](screenshots/size.png)  
 -t \<timeout\>	   Timeout in seconds to wait for each reply (default: 1)   
 -i \<interval\>	   Interval in seconds between packets (default: 1)  
 -t \<time in seconds\>	      Time-to-live value for outgoing packets (default: 64)  
