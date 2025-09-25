@@ -66,6 +66,7 @@ sudo ./echopulse [options] \<destination\>
 ![EchoPulse Sample Output](screenshots/help.png)  
 
 
+NOTE: The options can be combined  
 **Example**
 
 Ping google.com 5 times with 64-byte payloads, 2-second timeout, and 1-second interval:
