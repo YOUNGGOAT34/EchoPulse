@@ -85,7 +85,6 @@ void command_parser(i8 argc,i8 *argv[]){
                opts->timeout=strtol(optarg,NULL,0);
                break;
             case 'w':
-         
                opts->time=strtol(optarg,NULL,0);
                break;
             case 'i':
