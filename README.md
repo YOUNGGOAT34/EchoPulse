@@ -42,6 +42,9 @@ sudo ./echopulse [options] \<destination\>
 -w \<time in seconds\>	   Time after which the session will terminate  
 ![EchoPulse Sample Output](screenshots/time.png)  
 
+-i \<time in seconds\>	   set wait time before sending another packet (default: 1)  
+ ![EchoPulse Sample Output](screenshots/interval.png)  
+
 
 -W \<time in seconds\>	   set timeout for waiting the response (default: 1)  
  ![EchoPulse Sample Output](screenshots/timeout.png)  
