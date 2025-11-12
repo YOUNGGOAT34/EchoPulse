@@ -14,6 +14,14 @@ void handle_sigInt(__attribute__((unused)) i32 sig){
 }
 
 
+void compute_subnet_range(in_addr_t ip, in_addr_t mask) {
+   in_addr_t start_ip_address = ip & mask;
+   in_addr_t end_ip_address = start_ip_address | ~mask;
+   start_ip_address = htonl(ntohl(start_ip_address) + 1);
+   end_ip_address = htonl(ntohl(end_ip_address) - 1);
+}
+
+
 int main(i32 argc,i8 *argv[]){
 
     
