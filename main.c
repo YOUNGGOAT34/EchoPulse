@@ -14,18 +14,17 @@ void handle_sigInt(__attribute__((unused)) i32 sig){
 }
 
 
-
-int get_iface_ip_mask(in_addr_t *mask) {
+i32 get_iface_ip_mask(in_addr_t *mask,in_addr_t *current_ip) {
    // char *iface="wlan0";
-   int fd = socket(AF_INET, SOCK_DGRAM, 0);
+   i32 fd = socket(AF_INET, SOCK_DGRAM, 0);
    if (fd < 0) return -1;
    
    struct ifreq if_request;
    strncpy(if_request.ifr_name,"wlan0", IFNAMSIZ);
 
    // Get IP
-   // if (ioctl(fd, SIOCGIFADDR, &if_request) < 0) return -1;
-   // *ip = ((struct sockaddr_in *)&if_request.ifr_addr)->sin_addr.s_addr;
+   if (ioctl(fd, SIOCGIFADDR, &if_request) < 0) return -1;
+   *current_ip = ((struct sockaddr_in *)&if_request.ifr_addr)->sin_addr.s_addr;
 
    // Get Netmask
    if (ioctl(fd, SIOCGIFNETMASK, &if_request) < 0) return -1;
@@ -45,19 +44,26 @@ void compute_subnet_range(in_addr_t ip, in_addr_t mask) {
    in_addr_t end_ip_address = start_ip_address | ~mask;
    start_ip_address = htonl(ntohl(start_ip_address) + 1);
    end_ip_address = htonl(ntohl(end_ip_address) - 1);
+
+   printf("Start ip: %s\n",print_ip(start_ip_address));
+   printf("End Ip address: %s\n",print_ip(end_ip_address));
 }
 
 
-int main(i32 argc,i8 *argv[]){
+i32 main(i32 argc,i8 *argv[]){
+    
+   // command_parser(argc,argv);
+   in_addr_t current_ip;
+   in_addr_t mac;
 
     
 
-     command_parser(argc,argv);
-
-     
+   get_iface_ip_mask(&mac,&current_ip);
+   compute_subnet_range(current_ip,mac);
+   
    
 
-
+   
      return 0;
 
 }
