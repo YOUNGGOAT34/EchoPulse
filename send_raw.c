@@ -154,7 +154,7 @@ void send_raw_ip(IP *packet,STATS *stats,RTTsBuffer *rtts,options *opts){
          size+=packet->payload->size;
      }
 
-      gettimeofday(&start,NULL);
+     gettimeofday(&start,NULL);
      ssize_t bytes_sent=sendto(sockfd,raw_ip,size,0,(const struct sockaddr *)&dst,sizeof(dst));
      if(bytes_sent<0){
          error("sending raw ip packet\n");
