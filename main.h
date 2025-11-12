@@ -3,6 +3,9 @@
 
 #include "hexadump.h"
 #include "send_raw.h"
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#include <net/if.h>
 #include <getopt.h>
 
 

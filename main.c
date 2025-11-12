@@ -14,6 +14,32 @@ void handle_sigInt(__attribute__((unused)) i32 sig){
 }
 
 
+
+int get_iface_ip_mask(in_addr_t *mask) {
+   // char *iface="wlan0";
+   int fd = socket(AF_INET, SOCK_DGRAM, 0);
+   if (fd < 0) return -1;
+   
+   struct ifreq if_request;
+   strncpy(if_request.ifr_name,"wlan0", IFNAMSIZ);
+
+   // Get IP
+   // if (ioctl(fd, SIOCGIFADDR, &if_request) < 0) return -1;
+   // *ip = ((struct sockaddr_in *)&if_request.ifr_addr)->sin_addr.s_addr;
+
+   // Get Netmask
+   if (ioctl(fd, SIOCGIFNETMASK, &if_request) < 0) return -1;
+   *mask = ((struct sockaddr_in *)&if_request.ifr_netmask)->sin_addr.s_addr;
+
+   // Get MAC
+   // if (ioctl(fd, SIOCGIFHWADDR, &if_request) < 0) return -1;
+   // memcpy(mac, if_request.ifr_hwaddr.sa_data, 6);
+
+   close(fd);
+   return 0;
+}
+
+
 void compute_subnet_range(in_addr_t ip, in_addr_t mask) {
    in_addr_t start_ip_address = ip & mask;
    in_addr_t end_ip_address = start_ip_address | ~mask;
