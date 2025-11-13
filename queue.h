@@ -4,6 +4,7 @@
 
 typedef struct{
    void (*function)(void *);
+   void *arg;
 
 }TASK;
 
