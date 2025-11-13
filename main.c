@@ -45,8 +45,6 @@ void compute_subnet_range(in_addr_t ip, in_addr_t mask) {
    start_ip_address = htonl(ntohl(start_ip_address) + 1);
    end_ip_address = htonl(ntohl(end_ip_address) - 1);
 
-   printf("Start ip: %s\n",print_ip(start_ip_address));
-   printf("End Ip address: %s\n",print_ip(end_ip_address));
 }
 
 
@@ -56,13 +54,8 @@ i32 main(i32 argc,i8 *argv[]){
    in_addr_t current_ip;
    in_addr_t mac;
 
-    
-
    get_iface_ip_mask(&mac,&current_ip);
    compute_subnet_range(current_ip,mac);
-   
-   
-
    
      return 0;
 
@@ -178,7 +171,7 @@ void command_parser(i8 argc,i8 *argv[]){
    IP *pkt=create_ip_packet(ICMP,3000,ip);
 
    pkt->payload=packet;
-//    u8 *raw_bytes=create_raw_ip(pkt,opts);
+
 
    STATS *stats;
 
