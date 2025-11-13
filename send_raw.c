@@ -160,12 +160,11 @@ void send_raw_ip(IP *packet,STATS *stats,RTTsBuffer *rtts,options *opts){
      }
 
 
-     
      ssize_t received_bytes=recv_ip_packet(sockfd,opts,packet->dst);
      gettimeofday(&end,NULL);
-     
      double rtt=((end.tv_sec-start.tv_sec)*1000.0L)+((end.tv_usec-start.tv_usec)/1000.0L);
      stats->packets_sent++;
+
      if(received_bytes>=0){
           add_rtt(rtts,rtt);
           stats->min_rtt=(rtt<stats->min_rtt)?rtt:stats->min_rtt;
