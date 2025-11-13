@@ -13,8 +13,9 @@ typedef struct{
      i32 capacity;
      i32 front;
      i32 back;
-     
-
 }QUEUE;
+
+
+void initialize_queue(QUEUE *q,i32 capacity);
 
 #endif
