@@ -21,3 +21,14 @@ i32 enqueue(QUEUE *q,TASK task){
     return 0;
 
 }
+
+i32 pop(QUEUE *q,TASK *task){
+    if(q->tasks_count==0){
+       return -1;
+    }
+
+    *task=q->tasks[q->front];
+    q->front=(q->front+1) % q->capacity;
+    q->tasks_count--;
+    return 0;
+}
