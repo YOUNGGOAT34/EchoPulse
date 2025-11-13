@@ -18,4 +18,6 @@ typedef struct{
 
 void initialize_queue(QUEUE *q,i32 capacity);
 i32 enqueue(QUEUE *q,TASK task);
+void destroy_queue(QUEUE *q);
+i32 pop(QUEUE *q,TASK *task);
 #endif

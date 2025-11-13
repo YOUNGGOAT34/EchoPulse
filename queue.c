@@ -32,3 +32,7 @@ i32 pop(QUEUE *q,TASK *task){
     q->tasks_count--;
     return 0;
 }
+
+void destroy_queue(QUEUE *q) {
+    free(q->tasks);
+}
