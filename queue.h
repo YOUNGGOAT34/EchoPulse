@@ -17,5 +17,5 @@ typedef struct{
 
 
 void initialize_queue(QUEUE *q,i32 capacity);
-
+i32 enqueue(QUEUE *q,TASK task);
 #endif
