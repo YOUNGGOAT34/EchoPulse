@@ -1,6 +1,6 @@
 #ifndef QUEUE_H
 #define QUEUE_H
-#include "icmp.h"
+#include "hexadump.h"
 
 typedef struct{
    void (*function)(void *);

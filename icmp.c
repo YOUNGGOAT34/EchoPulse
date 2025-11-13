@@ -48,10 +48,8 @@ u8 *create_raw_icmp(icmp *packet){
     u16 check=checksum(ptr,total_size);
     check=htons(check);
     memcpy(ptr+2,&check,sizeof(u16));
-
     return ptr;
-
-
+   
 }
 
 void print_icmp_packet(icmp *packet,u16 size){
