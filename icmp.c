@@ -1,5 +1,20 @@
+
+
+#include<stdlib.h>
+#include<stdbool.h>
+#include<sys/socket.h>
+#include <string.h>
+#include <errno.h>
+#include <unistd.h>
+#include <netinet/in.h>
+#include <sys/time.h>
+#include <limits.h>
+#include <netdb.h>
+
+
 #include "icmp.h"
 #include "hexadump.h"
+
 
 void error(const i8* msg){
    fprintf(stderr,RED"Error:%s (%s)\n",msg,strerror(errno));

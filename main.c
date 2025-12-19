@@ -1,4 +1,22 @@
+#include <string.h>
+#include <limits.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#include <net/if.h>
+#include <getopt.h>
+#include<unistd.h>
+#include<errno.h>
+#include<stdlib.h>
+#include <sys/socket.h>
+#include <signal.h>
+#include <arpa/inet.h>
+#include<netdb.h>
+#include "hexadump.h"
+#include "send_raw.h"
+
 #include "main.h"
+
+
 
 /*
   
@@ -29,10 +47,6 @@ i32 get_iface_ip_mask(in_addr_t *mask,in_addr_t *current_ip) {
    if (ioctl(fd, SIOCGIFNETMASK, &if_request) < 0) return -1;
    *mask = ((struct sockaddr_in *)&if_request.ifr_netmask)->sin_addr.s_addr;
 
-   // Get MAC
-   // if (ioctl(fd, SIOCGIFHWADDR, &if_request) < 0) return -1;
-   // memcpy(mac, if_request.ifr_hwaddr.sa_data, 6);
-
    close(fd);
    return 0;
 }
@@ -51,20 +65,22 @@ void compute_subnet_range(in_addr_t ip, in_addr_t mask) {
 
 i32 main(i32 argc,i8 *argv[]){
     
-   // command_parser(argc,argv);
-   in_addr_t current_ip;
-   in_addr_t mac;
+  
+   // in_addr_t current_ip;
+   // in_addr_t mac;
 
     
 
-   get_iface_ip_mask(&mac,&current_ip);
-   compute_subnet_range(current_ip,mac);
+   // get_iface_ip_mask(&mac,&current_ip);
+   // compute_subnet_range(current_ip,mac);
+
+   command_parser(argc,argv);
 
      return 0;
 
 }
 
-void command_parser(i8 argc,i8 *argv[]){
+void command_parser(i32 argc,i8 *argv[]){
     
      if(argc<2){
           help();

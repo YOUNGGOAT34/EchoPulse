@@ -1,19 +1,8 @@
 #ifndef ICMP_H
 #define ICMP_H
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<stdbool.h>
-#include<sys/socket.h>
-#include "string.h"
-#include "errno.h"
-#include <unistd.h>
 #include <stdbool.h>
-#include <netinet/in.h>
-#include <sys/time.h>
-#include <limits.h>
-#include <netdb.h>
-
+#include<stdio.h>
 
 
 

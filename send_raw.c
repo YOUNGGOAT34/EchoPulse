@@ -1,3 +1,10 @@
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <limits.h>
+#include <errno.h>
+#include <sys/time.h>
+
 #include "send_raw.h"
 
 void add_rtt(RTTsBuffer *rtts,long rtt){

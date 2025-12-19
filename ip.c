@@ -1,3 +1,9 @@
+#include <string.h>
+#include <stdlib.h>
+#include <arpa/inet.h>
+
+#include<unistd.h>
+
 #include "ip.h"
 
 u32 get_local_ip(void){
@@ -62,6 +68,7 @@ IP *create_ip_packet(const u8 type,u16 id,const i8 *dst){
       if(dst_ip==INADDR_NONE){
          error("invalid destination ip address\n");
       }
+
       memset(packet,0,sizeof(IP));
       
       packet->dst=dst_ip;
