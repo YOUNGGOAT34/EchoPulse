@@ -31,37 +31,6 @@ void handle_sigInt(__attribute__((unused)) i32 sig){
 }
 
 
-i32 get_iface_ip_mask(in_addr_t *mask,in_addr_t *current_ip) {
-   // char *iface="wlan0";
-   i32 fd = socket(AF_INET, SOCK_DGRAM, 0);
-   if (fd < 0) return -1;
-   
-   struct ifreq if_request;
-   strncpy(if_request.ifr_name,"wlan0", IFNAMSIZ);
-
-   // Get IP
-   if (ioctl(fd, SIOCGIFADDR, &if_request) < 0) return -1;
-   *current_ip = ((struct sockaddr_in *)&if_request.ifr_addr)->sin_addr.s_addr;
-
-   // Get Netmask
-   if (ioctl(fd, SIOCGIFNETMASK, &if_request) < 0) return -1;
-   *mask = ((struct sockaddr_in *)&if_request.ifr_netmask)->sin_addr.s_addr;
-
-   close(fd);
-   return 0;
-}
-
-
-void compute_subnet_range(in_addr_t ip, in_addr_t mask) {
-   in_addr_t start_ip_address = ip & mask;
-   in_addr_t end_ip_address = start_ip_address | ~mask;
-   start_ip_address = htonl(ntohl(start_ip_address) + 1);
-   end_ip_address = htonl(ntohl(end_ip_address) - 1);
-
-   printf("Start ip: %s\n",print_ip(start_ip_address));
-   printf("End Ip address: %s\n",print_ip(end_ip_address));
-}
-
 
 i32 main(i32 argc,i8 *argv[]){
     
@@ -87,6 +56,7 @@ void command_parser(i32 argc,i8 *argv[]){
           exit(EXIT_SUCCESS);
      
      }
+     
 
       
    static struct option long_options[]={
@@ -101,7 +71,7 @@ void command_parser(i32 argc,i8 *argv[]){
      {"help",no_argument,0,'h'},
      {0,0,0,0}
    };
-
+   
 
    double_hyphen(argc,argv);
 
@@ -116,6 +86,9 @@ void command_parser(i32 argc,i8 *argv[]){
    opts->timeout=1000;
    opts->time=0;
    opts->interval=0;
+
+
+   bool broad_cast=false;
 
 
    while((option=getopt_long(argc,argv,"c:hqs:t:W:w:i:f",long_options,&options_index))!=-1){
@@ -145,7 +118,7 @@ void command_parser(i32 argc,i8 *argv[]){
                opts->interval=strtol(optarg,NULL,0);
                break;
             case 'f':
-                printf("Hey\n");
+                broad_cast=true;
                break;
             default:
               fprintf(stderr,RED"Unknown option\n"RESET);
@@ -155,7 +128,7 @@ void command_parser(i32 argc,i8 *argv[]){
    }
 
 
-   if(optind>=argc){
+   if(optind>=argc && ! broad_cast){
           fprintf(stderr,RED"\n\tExpected a destination address ,Usage: ./main [options] <destination name or ip> \n\n"RESET);
           exit(EXIT_FAILURE);
      }
@@ -174,7 +147,7 @@ void command_parser(i32 argc,i8 *argv[]){
        error("Failed to allocate memory for a raw icmp packet");
    }
  
-  
+    
    struct addrinfo hints,*res;
    memset(&hints,0,sizeof(hints));
 
@@ -202,12 +175,18 @@ void command_parser(i32 argc,i8 *argv[]){
    i8 *ip_dst=print_ip(inet_addr(ip));
   
    printf(GREEN"\nSending %hd bytes to %s \n"RESET,opts->payload_size,ip_dst);
+    
+   if(!broad_cast){
 
-   if(opts->count==INT_MAX){
-      stats=send_packets(pkt,&keep_sending,opts);
-   }else if(opts->count>=0){
-      stats=send_n_packets(pkt,opts,&keep_sending);
+      if(opts->count==INT_MAX ){
+         stats=send_packets(pkt,&keep_sending,opts);
+      }else if(opts->count>=0){
+         stats=send_n_packets(pkt,opts,&keep_sending);
+      }
+   }else{
+       
    }
+  
 
    
    /*
