@@ -96,6 +96,7 @@ void command_parser(i32 argc,i8 *argv[]){
      {"ttl",required_argument,0,'t'},
      {"timeout",required_argument,0,'W'},
      {"time",required_argument,0,'w'},
+     {"find",no_argument,0,'f'},
      {"interval",required_argument,0,'i'},
      {"help",no_argument,0,'h'},
      {0,0,0,0}
@@ -116,7 +117,8 @@ void command_parser(i32 argc,i8 *argv[]){
    opts->time=0;
    opts->interval=0;
 
-   while((option=getopt_long(argc,argv,"c:hqs:t:W:w:i:",long_options,&options_index))!=-1){
+
+   while((option=getopt_long(argc,argv,"c:hqs:t:W:w:i:f",long_options,&options_index))!=-1){
         switch(option){
             case 'h':
                help();
@@ -141,6 +143,9 @@ void command_parser(i32 argc,i8 *argv[]){
                break;
             case 'i':
                opts->interval=strtol(optarg,NULL,0);
+               break;
+            case 'f':
+                printf("Hey\n");
                break;
             default:
               fprintf(stderr,RED"Unknown option\n"RESET);
@@ -190,7 +195,7 @@ void command_parser(i32 argc,i8 *argv[]){
    IP *pkt=create_ip_packet(ICMP,3000,ip);
 
    pkt->payload=packet;
-//    u8 *raw_bytes=create_raw_ip(pkt,opts);
+
 
    STATS *stats;
 
@@ -294,6 +299,7 @@ void help(){
      exit(EXIT_SUCCESS);
    
   }
+
 
 
 u8 parse_ttl(const i8 *ttl){
