@@ -1,6 +1,6 @@
 CC :=gcc
 
-FLAGS := -Wall -Wextra
+FLAGS := -Wall -Wextra -g -O0
 LDFLAGS := -lm
 SRC := $(wildcard *.c)
 OBJECTS := $(SRC:.c=.o)

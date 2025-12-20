@@ -165,7 +165,7 @@ void send_raw_ip(IP *packet,STATS *stats,RTTsBuffer *rtts,options *opts){
      if(bytes_sent<0){
          error("sending raw ip packet\n");
      }
-
+     
 
      ssize_t received_bytes=recv_ip_packet(sockfd,opts,packet->dst);
      gettimeofday(&end,NULL);

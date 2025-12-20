@@ -22,6 +22,8 @@ IP *pop(queue *q);
 bool empty(queue *q);
 
 
+
+
 void start_threads(IP *packet);
 
 i32 get_iface_ip_mask(in_addr_t *mask,in_addr_t *current_ip);

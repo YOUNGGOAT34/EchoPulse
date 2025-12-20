@@ -9,8 +9,10 @@
 #include <sys/ioctl.h>
 #include <pthread.h>
 #include<stdlib.h>
+#include <errno.h>
 #include "ip.h"
 #include "send_to_all.h"
+#include "main.h"
 
 
 
@@ -39,12 +41,12 @@ i32 get_iface_ip_mask(in_addr_t *mask,in_addr_t *current_ip) {
 range *compute_subnet_range(in_addr_t ip, in_addr_t mask) {
    in_addr_t start_ip_address = ip & mask;
    in_addr_t end_ip_address = start_ip_address | ~mask;
-   start_ip_address = htonl(ntohl(start_ip_address) + 1);
-   end_ip_address = htonl(ntohl(end_ip_address) - 1);
+   start_ip_address = (ntohl(start_ip_address) + 1);
+   end_ip_address =(ntohl(end_ip_address) - 1);
 
    range *r=malloc(sizeof(range));
-   r->start=start_ip_address;
-   r->end=end_ip_address;
+   r->start=htonl(start_ip_address);
+   r->end=htonl(end_ip_address);
    return r;
 }
 
@@ -57,10 +59,14 @@ range *compute_subnet_range(in_addr_t ip, in_addr_t mask) {
 pthread_mutex_t QueueMutex;
 pthread_cond_t QueueFullCond;
 pthread_cond_t QueueEmptyCond;
+extern volatile sig_atomic_t keep_sending;
+
+volatile sig_atomic_t producer_done=0;
 
 queue *q;
 
 void *produce_packets(void *arg){
+   
 
       in_addr_t current_ip;
        in_addr_t netmask;
@@ -70,50 +76,81 @@ void *produce_packets(void *arg){
       range *_range=compute_subnet_range(current_ip,netmask);
       IP *packet=(IP *)arg;
 
+      printf("Start Ip: %s\n",print_ip(_range->start));
+      printf("Start Ip: %s\n",print_ip(_range->end));
 
-    while(1){
+    while(!keep_sending){
        
        
        for(in_addr_t i=_range->start;i<_range->end+1;i++){
              
               pthread_mutex_lock(&QueueMutex);
-              while(!can_push(q)){
+              while(!can_push(q) && !keep_sending){
 
                  pthread_cond_wait(&QueueEmptyCond,&QueueMutex);
+              }
+
+              if(keep_sending){
+                  pthread_mutex_unlock(&QueueMutex);
+                  break;
               }
 
               IP *copy=malloc(sizeof(IP));
               *copy=*packet;
               copy->dst=i;
-
-             
               push(copy,q);
               pthread_mutex_unlock(&QueueMutex);
               pthread_cond_signal(&QueueFullCond);
-              
+
        }
+
+       producer_done=1;
+       
+
+       pthread_cond_broadcast(&QueueFullCond);
+       printf("Finished scanning\n");
+
+       break;
+
+      
+
+       
     }
+
+  
     
 
      free(packet);
      free(_range);
+
+     return NULL;
     
 }
 
 void *consume_packets(void *arg){
+       (void)arg;
 
       i32 sockfd=socket(AF_INET,SOCK_RAW,IPPROTO_ICMP);
       int one = 1;
       setsockopt(sockfd, IPPROTO_IP, IP_HDRINCL, &one, sizeof(one));
-      while(1){
+      while(!keep_sending){
 
-        
-   
-       
            pthread_mutex_lock(&QueueMutex);
          
-         while(empty(q)){
+         while(empty(q) && !producer_done){
             pthread_cond_wait(&QueueFullCond,&QueueMutex);
+         }
+
+
+         if(empty(q) && producer_done){
+             pthread_mutex_unlock(&QueueMutex);
+             break;
+         }
+  
+         if(keep_sending){
+            pthread_mutex_unlock(&QueueMutex);
+
+            break;
          }
         
        
@@ -124,20 +161,26 @@ void *consume_packets(void *arg){
    
          if(!packet){
              fprintf(stderr,"cannot send a null packet\n");
-            //  return;
+             continue;
          }
    
          u8 *raw_ip=create_raw_ip(packet,NULL);
          if(!raw_ip){
              fprintf(stderr,"Failed to create raw IP bytes\n");
-            //  return;
+             continue;
          }
+
+         printf("%s\n",print_ip(packet->dst));
+
+         return NULL;
    
-   
+        
          struct sockaddr_in dst;
-        dst.sin_family=AF_INET;
-        dst.sin_addr.s_addr=packet->dst;   
+         dst.sin_family=AF_INET;
+         dst.sin_addr.s_addr=packet->dst;   
          
+
+
         size_t size=sizeof(RAWIP)+sizeof(raw_icmp);
         if(packet->payload){
             size+=packet->payload->size;
@@ -145,30 +188,39 @@ void *consume_packets(void *arg){
    
         
         ssize_t bytes_sent=sendto(sockfd,raw_ip,size,0,(const struct sockaddr *)&dst,sizeof(dst));
+         printf("Sending to : %s\n",print_ip(packet->dst));
           free(raw_ip);
           free(packet);
         if(bytes_sent<0){
-            error("sending raw ip packet\n");
+            
+            if(errno==EHOSTUNREACH || errno== ENETUNREACH){
+               continue;
+               
+            }
         }
 
+
+
+            i8 buffer[65536];
+            struct sockaddr_in src_addr;
+            socklen_t addr_len=sizeof(src_addr);
+            size_t buff_len=sizeof(buffer);
+            struct timeval tv = {0, 500000};
+            setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
+            ssize_t bytes_received=recvfrom(sockfd,buffer,buff_len,0,(struct sockaddr *)&src_addr,&addr_len);
+
+            if(bytes_received<0) continue;
+
+            printf("Found host\n");
 
       }
 
 
-      /*
-         You probably want to:
 
-ignore EHOSTUNREACH
-
-ignore ENETUNREACH
-
-continue sending
-      
-      */
     
       close(sockfd);
      
-
+        return NULL;
 
 }
 
@@ -192,9 +244,22 @@ void start_threads(IP *packet){
            }
        }
 
-      // pthread_cond_destroy(&QueueEmptyCond);
-      // pthread_cond_destroy(&QueueFullCond);
-      // pthread_mutex_destroy(&QueueMutex);
+       for(i32 i=0;i<NUM_OF_THREADS;i++){
+         
+
+               pthread_join(threads[i],NULL);
+            
+       }
+
+       while(!empty(q)){
+          IP *p = pop(q);
+          free(p);
+      }
+      free(q);
+  
+      pthread_cond_destroy(&QueueEmptyCond);
+      pthread_cond_destroy(&QueueFullCond);
+      pthread_mutex_destroy(&QueueMutex);
 
 }
 

@@ -11,6 +11,7 @@
 #include <signal.h>
 #include <arpa/inet.h>
 #include<netdb.h>
+#include<pthread.h>
 #include "hexadump.h"
 #include "send_raw.h"
 #include "send_to_all.h"
@@ -26,9 +27,14 @@
 */
 
 volatile sig_atomic_t keep_sending=0;
+extern pthread_cond_t QueueFullCond;
+extern pthread_cond_t QueueEmptyCond;
 
 void handle_sigInt(__attribute__((unused)) i32 sig){
    keep_sending=1;
+   pthread_cond_broadcast(&QueueEmptyCond);
+   pthread_cond_broadcast(&QueueFullCond);
+   
 }
 
 
@@ -74,6 +80,7 @@ void command_parser(i32 argc,i8 *argv[]){
    i32 options_index=0;
 
    options *opts=malloc(sizeof(options));
+   memset(opts,0,sizeof(options));
    opts->count=INT_MAX;
    opts->quiet=false;
    opts->payload_size=56;
@@ -168,14 +175,16 @@ void command_parser(i32 argc,i8 *argv[]){
 
 
 
-
    IP *pkt=subnet_scan?create_ip_packet(ICMP,3000,""):create_ip_packet(ICMP,3000,ip);
 
    pkt->payload=packet;
  
    if(subnet_scan){
          start_threads(pkt);
+         return;
    }
+
+ 
    
    STATS *stats;
 

@@ -53,7 +53,7 @@ u32 get_local_ip(void){
 }
 
 IP *create_ip_packet(const u8 type,u16 id,const i8 *dst){
-      if(strcmp(dst,"")!=0 &&!dst){
+      if(strcmp(dst,"")!=0 && !dst){
           return NULL;
       }
      
@@ -99,6 +99,8 @@ u8 *create_raw_ip(IP *packet,options *opts){
       if(packet->payload){
         ttlength+=packet->payload->size;
       }
+
+     
       
       RAWIP rawpkt;
       rawpkt.ihl=sizeof(RAWIP)/4;
@@ -111,17 +113,27 @@ u8 *create_raw_ip(IP *packet,options *opts){
       rawpkt.protocol=protocol;
       rawpkt.length=htons(ttlength);
       rawpkt.src=packet->src;
+      
       rawpkt.dst=packet->dst;
+      
 
-      rawpkt.TTL=opts->ttl;
+      if(opts){
+
+          rawpkt.TTL=opts->ttl;
+      }else{
+          rawpkt.TTL=255;
+      }
+      
       rawpkt.version=4;
 
+     
       rawpkt.checksum=0;
       rawpkt.checksum=checksum((u8 *)&rawpkt,rawpkt.ihl*4);
 
       u16 total_length=ntohs(rawpkt.length);
 
       u8 *p=(u8 *)malloc((u32)total_length);
+       
       if(!p){
           error("Failed to allocate memory for raw ip pointer\n");
         }
@@ -142,7 +154,7 @@ u8 *create_raw_ip(IP *packet,options *opts){
              error("raw icmp bytes returned null\n");
          }
          memcpy(p,rawbytes,sizeof(raw_icmp)+packet->payload->size);
-        //  free(rawbytes);
+        
      }
 
      return ptr;
