@@ -45,10 +45,12 @@ range *compute_subnet_range(in_addr_t ip, in_addr_t mask) {
    end_ip_address =(ntohl(end_ip_address) - 1);
 
    range *r=malloc(sizeof(range));
-   r->start=htonl(start_ip_address);
-   r->end=htonl(end_ip_address);
+   r->start=(start_ip_address);
+   r->end=(end_ip_address);
    return r;
 }
+
+
 
 
 /*
@@ -57,6 +59,7 @@ range *compute_subnet_range(in_addr_t ip, in_addr_t mask) {
 */
 
 pthread_mutex_t QueueMutex;
+pthread_mutex_t printMutex;
 pthread_cond_t QueueFullCond;
 pthread_cond_t QueueEmptyCond;
 extern volatile sig_atomic_t keep_sending;
@@ -97,7 +100,7 @@ void *produce_packets(void *arg){
 
               IP *copy=malloc(sizeof(IP));
               *copy=*packet;
-              copy->dst=i;
+              copy->dst=htonl(i);
               push(copy,q);
               pthread_mutex_unlock(&QueueMutex);
               pthread_cond_signal(&QueueFullCond);
@@ -112,13 +115,11 @@ void *produce_packets(void *arg){
 
        break;
 
-      
-
+   
        
     }
 
-  
-    
+
 
      free(packet);
      free(_range);
@@ -134,7 +135,7 @@ void *consume_packets(void *arg){
       int one = 1;
       setsockopt(sockfd, IPPROTO_IP, IP_HDRINCL, &one, sizeof(one));
       while(!keep_sending){
-
+            
            pthread_mutex_lock(&QueueMutex);
          
          while(empty(q) && !producer_done){
@@ -170,9 +171,7 @@ void *consume_packets(void *arg){
              continue;
          }
 
-         printf("%s\n",print_ip(packet->dst));
 
-         return NULL;
    
         
          struct sockaddr_in dst;
@@ -188,7 +187,9 @@ void *consume_packets(void *arg){
    
         
         ssize_t bytes_sent=sendto(sockfd,raw_ip,size,0,(const struct sockaddr *)&dst,sizeof(dst));
-         printf("Sending to : %s\n",print_ip(packet->dst));
+        pthread_mutex_lock(&printMutex);
+         // printf("Sending to : %s\n",print_ip(packet->dst));
+         pthread_mutex_unlock(&printMutex);
           free(raw_ip);
           free(packet);
         if(bytes_sent<0){
@@ -230,7 +231,7 @@ void start_threads(IP *packet){
   q=malloc(sizeof(queue));
   q->size=0;
 
-    pthread_t threads[NUM_OF_THREADS];
+      pthread_t threads[NUM_OF_THREADS];
 
       pthread_mutex_init(&QueueMutex,NULL);
       pthread_cond_init(&QueueFullCond,NULL);
@@ -246,7 +247,6 @@ void start_threads(IP *packet){
 
        for(i32 i=0;i<NUM_OF_THREADS;i++){
          
-
                pthread_join(threads[i],NULL);
             
        }
@@ -260,6 +260,22 @@ void start_threads(IP *packet){
       pthread_cond_destroy(&QueueEmptyCond);
       pthread_cond_destroy(&QueueFullCond);
       pthread_mutex_destroy(&QueueMutex);
+
+
+      // in_addr_t current_ip;
+      // in_addr_t netmask;
+   
+     
+      // get_iface_ip_mask(&netmask,&current_ip);
+      // range *_range=compute_subnet_range(current_ip,netmask);
+      // i32 counter=0;
+      // for(in_addr_t i=(_range->start);i<(_range->end);i++){
+      //      counter++;
+      //      printf("%s\n",print_ip(htonl(i)));
+      // }
+
+      // printf("%d\n",counter);
+
 
 }
 
