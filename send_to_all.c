@@ -12,6 +12,7 @@
 
 
 
+
 i32 get_iface_ip_mask(in_addr_t *mask,in_addr_t *current_ip) {
    // char *iface="wlan0";
    i32 fd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -23,7 +24,7 @@ i32 get_iface_ip_mask(in_addr_t *mask,in_addr_t *current_ip) {
    // Get IP
    if (ioctl(fd, SIOCGIFADDR, &if_request) < 0) return -1;
    *current_ip = ((struct sockaddr_in *)&if_request.ifr_addr)->sin_addr.s_addr;
-
+    
    // Get Netmask
    if (ioctl(fd, SIOCGIFNETMASK, &if_request) < 0) return -1;
    *mask = ((struct sockaddr_in *)&if_request.ifr_netmask)->sin_addr.s_addr;
@@ -41,4 +42,39 @@ void compute_subnet_range(in_addr_t ip, in_addr_t mask) {
 
    printf("Start ip: %s\n",print_ip(start_ip_address));
    printf("End Ip address: %s\n",print_ip(end_ip_address));
+}
+
+
+//implementation of queue functions
+void push(IP *packet,queue *q){
+   if(q->size>=MAX_SIZE){
+       fprintf(stderr,"The queue is full\n");
+       return;
+   }
+   q->packets[q->size++]=packet;
+
+}
+
+IP *pop(queue *q){
+    if(empty(q)){
+       fprintf(stderr,"popping from an empty queue\n");
+       return NULL;
+    }
+    IP *packet=q->packets[0];
+    if(!packet){
+       fprintf(stderr,"Empty packet in the queue\n");
+       return NULL;
+    }
+
+    
+    for(i32 i=0;i<q->size-1;i++){
+         q->packets[i]=q->packets[i+1];
+    }
+
+    q->size--;
+
+    return packet;
+}
+bool empty(queue *q){
+     return  q->size==0;
 }
