@@ -132,6 +132,9 @@ void *consume_packets(void *arg){
        (void)arg;
 
       i32 sockfd=socket(AF_INET,SOCK_RAW,IPPROTO_ICMP);
+      if(sockfd<1){
+           error("Failed to create socket");
+      }
       int one = 1;
       setsockopt(sockfd, IPPROTO_IP, IP_HDRINCL, &one, sizeof(one));
       while(!keep_sending){
@@ -172,8 +175,7 @@ void *consume_packets(void *arg){
          }
 
 
-   
-        
+
          struct sockaddr_in dst;
          dst.sin_family=AF_INET;
          dst.sin_addr.s_addr=packet->dst;   
@@ -188,11 +190,10 @@ void *consume_packets(void *arg){
         
         ssize_t bytes_sent=sendto(sockfd,raw_ip,size,0,(const struct sockaddr *)&dst,sizeof(dst));
         pthread_mutex_lock(&printMutex);
-         // printf("Sending to : %s\n",print_ip(packet->dst));
          pthread_mutex_unlock(&printMutex);
-          free(raw_ip);
-          free(packet);
-        if(bytes_sent<0){
+         //  free(raw_ip);
+         //  free(packet);
+        if(bytes_sent<1){
             
             if(errno==EHOSTUNREACH || errno== ENETUNREACH){
                continue;
@@ -207,19 +208,40 @@ void *consume_packets(void *arg){
             socklen_t addr_len=sizeof(src_addr);
             size_t buff_len=sizeof(buffer);
             struct timeval tv = {0, 500000};
+
             setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
             ssize_t bytes_received=recvfrom(sockfd,buffer,buff_len,0,(struct sockaddr *)&src_addr,&addr_len);
 
-            if(bytes_received<0) continue;
+            if(bytes_received<0){
+                            if(errno==EAGAIN || errno==EWOULDBLOCK){
+                                 
+                              }else if(errno==ECONNREFUSED){
+                                 printf(RED"Connection refused\n"RESET);
+                              }else if(errno==EINTR){
+                                 // return bytes_received;
+                              }else{
+                               printf("Response Error %s ,%d\n",strerror(errno),sockfd);
+                            }
 
-            printf("Found host\n");
+                            continue;
+            }
+
+             RAWIP *res=(RAWIP *)buffer;
+
+            raw_icmp *response=(raw_icmp*)(buffer + (res->ihl*4));
+
+            if(response->type==0 && packet->dst==res->src){
+                       printf("Found host %s\n",print_ip(packet->dst));
+            }
+
+            
 
       }
 
 
 
     
-      close(sockfd);
+      // close(sockfd);
      
         return NULL;
 

@@ -202,7 +202,6 @@ ssize_t recv_ip_packet(i32 sockfd,options *opts,u32 dst_ip){
    
    if(bytes_received<0){
       if(errno==EAGAIN || errno==EWOULDBLOCK){
-     //     printf(RED"Request timed out %s\n"RESET,strerror(errno));
          return bytes_received;
       }else if(errno==ECONNREFUSED){
          printf(RED"Connection refused\n"RESET);
