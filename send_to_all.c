@@ -239,9 +239,8 @@ void *consume_packets(void *arg){
       }
 
 
-
     
-      // close(sockfd);
+      close(sockfd);
      
         return NULL;
 
