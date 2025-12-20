@@ -79,8 +79,6 @@ void *produce_packets(void *arg){
       range *_range=compute_subnet_range(current_ip,netmask);
       IP *packet=(IP *)arg;
 
-      printf("Start Ip: %s\n",print_ip(_range->start));
-      printf("Start Ip: %s\n",print_ip(_range->end));
 
     while(!keep_sending){
        
