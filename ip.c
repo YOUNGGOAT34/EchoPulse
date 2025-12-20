@@ -53,7 +53,7 @@ u32 get_local_ip(void){
 }
 
 IP *create_ip_packet(const u8 type,u16 id,const i8 *dst){
-      if(!dst){
+      if(strcmp(dst,"")!=0 &&!dst){
           return NULL;
       }
      
@@ -65,9 +65,10 @@ IP *create_ip_packet(const u8 type,u16 id,const i8 *dst){
         u32 src=get_local_ip();
        
       u32 dst_ip=inet_addr(dst);
-      if(dst_ip==INADDR_NONE){
+      if(strcmp(dst,"")!=0 && dst_ip==INADDR_NONE){
          error("invalid destination ip address\n");
       }
+
 
       memset(packet,0,sizeof(IP));
       
@@ -76,7 +77,7 @@ IP *create_ip_packet(const u8 type,u16 id,const i8 *dst){
       packet->src=src;
       packet->type=type;
       packet->payload=NULL;
-
+       
       return packet;
 
   

@@ -13,6 +13,7 @@
 #include<netdb.h>
 #include "hexadump.h"
 #include "send_raw.h"
+#include "send_to_all.h"
 
 #include "main.h"
 
@@ -35,13 +36,7 @@ void handle_sigInt(__attribute__((unused)) i32 sig){
 i32 main(i32 argc,i8 *argv[]){
     
   
-   // in_addr_t current_ip;
-   // in_addr_t mac;
-
-    
-
-   // get_iface_ip_mask(&mac,&current_ip);
-   // compute_subnet_range(current_ip,mac);
+  
 
    command_parser(argc,argv);
 
@@ -88,7 +83,7 @@ void command_parser(i32 argc,i8 *argv[]){
    opts->interval=0;
 
 
-   bool broad_cast=false;
+   bool subnet_scan=false;
 
 
    while((option=getopt_long(argc,argv,"c:hqs:t:W:w:i:f",long_options,&options_index))!=-1){
@@ -118,7 +113,7 @@ void command_parser(i32 argc,i8 *argv[]){
                opts->interval=strtol(optarg,NULL,0);
                break;
             case 'f':
-                broad_cast=true;
+                subnet_scan=true;
                break;
             default:
               fprintf(stderr,RED"Unknown option\n"RESET);
@@ -128,7 +123,7 @@ void command_parser(i32 argc,i8 *argv[]){
    }
 
 
-   if(optind>=argc && ! broad_cast){
+   if(optind>=argc && ! subnet_scan){
           fprintf(stderr,RED"\n\tExpected a destination address ,Usage: ./main [options] <destination name or ip> \n\n"RESET);
           exit(EXIT_FAILURE);
      }
@@ -142,41 +137,53 @@ void command_parser(i32 argc,i8 *argv[]){
    memset(data,'G',opts->payload_size);
    icmp *packet = create_icmp_packet(echo,data, opts->payload_size);
    u8 *raw=create_raw_icmp(packet);
- 
+   
    if(!raw){
        error("Failed to allocate memory for a raw icmp packet");
    }
+
+  
  
-    
-   struct addrinfo hints,*res;
-   memset(&hints,0,sizeof(hints));
+    char ip[INET_ADDRSTRLEN];
+    struct addrinfo hints,*res;
+   if(!subnet_scan){
 
-   hints.ai_family=AF_INET;
-   hints.ai_socktype=SOCK_RAW;
-   hints.ai_protocol=IPPROTO_ICMP;
-   i32 status=getaddrinfo(argv[argc-1],NULL,&hints,&res);
+     
+      memset(&hints,0,sizeof(hints));
    
-   char ip[INET_ADDRSTRLEN];
-   struct sockaddr_in *addr=(struct sockaddr_in *)res->ai_addr;
-   inet_ntop(AF_INET, &(addr->sin_addr), ip, sizeof(ip));
-
-   if(status!=0){
-        fprintf(stderr,RED"Error getting address info %s \n"RESET,gai_strerror(status));
-        exit(EXIT_FAILURE);
+      hints.ai_family=AF_INET;
+      hints.ai_socktype=SOCK_RAW;
+      hints.ai_protocol=IPPROTO_ICMP;
+      i32 status=getaddrinfo(argv[argc-1],NULL,&hints,&res);
+      
+      
+      struct sockaddr_in *addr=(struct sockaddr_in *)res->ai_addr;
+      inet_ntop(AF_INET, &(addr->sin_addr), ip, sizeof(ip));
+   
+      if(status!=0){
+           fprintf(stderr,RED"Error getting address info %s \n"RESET,gai_strerror(status));
+           exit(EXIT_FAILURE);
+      }
    }
 
-   IP *pkt=create_ip_packet(ICMP,3000,ip);
+
+
+
+   IP *pkt=subnet_scan?create_ip_packet(ICMP,3000,""):create_ip_packet(ICMP,3000,ip);
 
    pkt->payload=packet;
-
-
+ 
+   if(subnet_scan){
+         start_threads(pkt);
+   }
+   
    STATS *stats;
 
    i8 *ip_dst=print_ip(inet_addr(ip));
   
    printf(GREEN"\nSending %hd bytes to %s \n"RESET,opts->payload_size,ip_dst);
     
-   if(!broad_cast){
+   if(!subnet_scan){
 
       if(opts->count==INT_MAX ){
          stats=send_packets(pkt,&keep_sending,opts);
