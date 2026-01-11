@@ -14,26 +14,16 @@
 #include<pthread.h>
 #include "hexadump.h"
 #include "send_raw.h"
-#include "send_to_all.h"
-
 #include "main.h"
 
 
 
-/*
-  
-  What if it can ping multiple hosts ,,and possibly ping the entire subnet???
-
-*/
-
 volatile sig_atomic_t keep_sending=0;
-extern pthread_cond_t QueueFullCond;
-extern pthread_cond_t QueueEmptyCond;
+
 
 void handle_sigInt(__attribute__((unused)) i32 sig){
    keep_sending=1;
-   pthread_cond_broadcast(&QueueEmptyCond);
-   pthread_cond_broadcast(&QueueFullCond);
+
    
 }
 
@@ -67,7 +57,6 @@ void command_parser(i32 argc,i8 *argv[]){
      {"ttl",required_argument,0,'t'},
      {"timeout",required_argument,0,'W'},
      {"time",required_argument,0,'w'},
-     {"find",no_argument,0,'f'},
      {"interval",required_argument,0,'i'},
      {"help",no_argument,0,'h'},
      {0,0,0,0}
@@ -89,11 +78,7 @@ void command_parser(i32 argc,i8 *argv[]){
    opts->time=0;
    opts->interval=0;
 
-
-   bool subnet_scan=false;
-
-
-   while((option=getopt_long(argc,argv,"c:hqs:t:W:w:i:f",long_options,&options_index))!=-1){
+   while((option=getopt_long(argc,argv,"c:hqs:t:W:w:i:",long_options,&options_index))!=-1){
         switch(option){
             case 'h':
                help();
@@ -119,9 +104,6 @@ void command_parser(i32 argc,i8 *argv[]){
             case 'i':
                opts->interval=strtol(optarg,NULL,0);
                break;
-            case 'f':
-                subnet_scan=true;
-               break;
             default:
               fprintf(stderr,RED"Unknown option\n"RESET);
 
@@ -130,10 +112,13 @@ void command_parser(i32 argc,i8 *argv[]){
    }
 
 
-   if(optind>=argc && ! subnet_scan){
+   
+   
+   if(optind>=argc){
           fprintf(stderr,RED"\n\tExpected a destination address ,Usage: ./main [options] <destination name or ip> \n\n"RESET);
           exit(EXIT_FAILURE);
      }
+    
 
    /*
        Will handle the ctrl+c signal ,used to exit the program when the number of packets are not specified
@@ -153,7 +138,7 @@ void command_parser(i32 argc,i8 *argv[]){
  
     char ip[INET_ADDRSTRLEN];
     struct addrinfo hints,*res;
-   if(!subnet_scan){
+   
 
      
       memset(&hints,0,sizeof(hints));
@@ -171,20 +156,15 @@ void command_parser(i32 argc,i8 *argv[]){
            fprintf(stderr,RED"Error getting address info %s \n"RESET,gai_strerror(status));
            exit(EXIT_FAILURE);
       }
-   }
+   
 
 
 
-   IP *pkt=subnet_scan?create_ip_packet(ICMP,3000,""):create_ip_packet(ICMP,3000,ip);
+   IP *pkt=create_ip_packet(ICMP,3000,ip);
 
    pkt->payload=packet;
  
-   if(subnet_scan){
-         start_threads(pkt);
-         return;
-   }
 
- 
    
    STATS *stats;
 
@@ -192,16 +172,14 @@ void command_parser(i32 argc,i8 *argv[]){
   
    printf(GREEN"\nSending %hd bytes to %s \n"RESET,opts->payload_size,ip_dst);
     
-   if(!subnet_scan){
 
-      if(opts->count==INT_MAX ){
+   if(opts->count==INT_MAX ){
          stats=send_packets(pkt,&keep_sending,opts);
       }else if(opts->count>=0){
          stats=send_n_packets(pkt,opts,&keep_sending);
       }
-   }else{
-       
-   }
+  
+
   
 
    
